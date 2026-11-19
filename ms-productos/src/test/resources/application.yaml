@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: msvc-producto
+
+  # Las pruebas usan una base H2 en memoria: no necesitan el .env ni tocan la base real.
+  datasource:
+    url: jdbc:h2:mem:productos;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+app:
+  cors:
+    allowed-origins: http://localhost:4200

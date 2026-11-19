@@ -1,0 +1,46 @@
+# Runtime data & logs
+data/
+logs/
+*.log
+
+# Maven & Java
+target/
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# Node & Angular
+node_modules/
+.angular/
+dist/
+tmp/
+
+# IDE, AI Assistants & OS
+.idea/
+.vscode/
+.claude/
+.gemini/
+.cursor/
+.kilo/
+**/.kilo/
+.agent/
+.agents/
+CLAUDE.md
+*.iml
+*.swp
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Environment overrides
+.env
+.env.*
+!.env.example
+
+# Git backups & temporary binaries
+**/.git_backup/
+.git_backup/
+DOCUMENTO_EXPOSICION.md
+cloudflared.exe
+*.exe
+*.tmp
+*.bak

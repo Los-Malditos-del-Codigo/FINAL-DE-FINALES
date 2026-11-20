@@ -1,0 +1,1516 @@
+./
+├── arquitectura.txt
+├── docker-compose.yml
+├── .env
+├── .env.example
+├── frontend
+│   ├── angular.json
+│   ├── Dockerfile
+│   ├── .editorconfig
+│   ├── .gitignore
+│   ├── nginx.conf
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── .prettierrc
+│   ├── proxy.conf.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   └── servillantaslogo.png
+│   ├── servillantaslogo.png
+│   ├── src
+│   │   ├── app
+│   │   │   ├── app.config.ts
+│   │   │   ├── app.html
+│   │   │   ├── app.routes.ts
+│   │   │   ├── app.scss
+│   │   │   ├── app.spec.ts
+│   │   │   ├── app.ts
+│   │   │   ├── core
+│   │   │   │   ├── guards
+│   │   │   │   │   └── auth.guard.ts
+│   │   │   │   ├── interceptors
+│   │   │   │   │   ├── auth.interceptor.ts
+│   │   │   │   │   └── mock-backend.interceptor.ts
+│   │   │   │   ├── mock-data
+│   │   │   │   │   └── seed-data.ts
+│   │   │   │   ├── models
+│   │   │   │   │   ├── alerta.model.ts
+│   │   │   │   │   ├── auth.model.ts
+│   │   │   │   │   ├── catalogos.model.ts
+│   │   │   │   │   ├── compra.model.ts
+│   │   │   │   │   ├── inventario.model.ts
+│   │   │   │   │   ├── producto.model.ts
+│   │   │   │   │   ├── proveedor.model.ts
+│   │   │   │   │   ├── servicio.model.ts
+│   │   │   │   │   ├── servicio-taller.model.ts
+│   │   │   │   │   └── venta.model.ts
+│   │   │   │   ├── services
+│   │   │   │   │   ├── alertas.service.ts
+│   │   │   │   │   ├── asistente-ia.service.ts
+│   │   │   │   │   ├── auth.service.ts
+│   │   │   │   │   ├── boleta-print.service.spec.ts
+│   │   │   │   │   ├── boleta-print.service.ts
+│   │   │   │   │   ├── catalogo.service.ts
+│   │   │   │   │   ├── compra.service.ts
+│   │   │   │   │   ├── compras.service.ts
+│   │   │   │   │   ├── excel-export.service.spec.ts
+│   │   │   │   │   ├── excel-export.service.ts
+│   │   │   │   │   ├── inventario.service.ts
+│   │   │   │   │   ├── mock-db.compras.spec.ts
+│   │   │   │   │   ├── mock-db.service.ts
+│   │   │   │   │   ├── producto.service.ts
+│   │   │   │   │   ├── proveedor.service.ts
+│   │   │   │   │   ├── reniec.service.ts
+│   │   │   │   │   ├── servicio.service.ts
+│   │   │   │   │   ├── servicios-taller.service.ts
+│   │   │   │   │   ├── tipo-servicio.service.ts
+│   │   │   │   │   ├── venta.service.ts
+│   │   │   │   │   └── ventas.service.ts
+│   │   │   │   ├── utils
+│   │   │   │   │   └── jwt.utils.ts
+│   │   │   │   └── validators
+│   │   │   │       ├── datos-contacto.validators.spec.ts
+│   │   │   │       └── datos-contacto.validators.ts
+│   │   │   ├── features
+│   │   │   │   ├── alertas
+│   │   │   │   │   └── alertas.component.ts
+│   │   │   │   ├── asistente-ia
+│   │   │   │   │   ├── archivos-ia.ts
+│   │   │   │   │   ├── asistente-ia.component.ts
+│   │   │   │   │   ├── diagrama-ia.component.ts
+│   │   │   │   │   ├── grafico-ia.component.ts
+│   │   │   │   │   ├── markdown.spec.ts
+│   │   │   │   │   ├── markdown.ts
+│   │   │   │   │   └── tipos.ts
+│   │   │   │   ├── auth
+│   │   │   │   │   └── login
+│   │   │   │   │       └── login.component.ts
+│   │   │   │   ├── compras
+│   │   │   │   │   ├── compras-list
+│   │   │   │   │   │   └── compras-list.component.ts
+│   │   │   │   │   └── proveedores
+│   │   │   │   │       └── proveedores.component.ts
+│   │   │   │   ├── dashboard
+│   │   │   │   │   └── dashboard.component.ts
+│   │   │   │   ├── inventario
+│   │   │   │   │   ├── movimientos-historial
+│   │   │   │   │   │   └── movimientos-historial.component.ts
+│   │   │   │   │   ├── registrar-entrada
+│   │   │   │   │   │   └── registrar-entrada.component.ts
+│   │   │   │   │   ├── registrar-salida
+│   │   │   │   │   │   └── registrar-salida.component.ts
+│   │   │   │   │   └── stock-panel
+│   │   │   │   │       └── stock-panel.component.ts
+│   │   │   │   ├── operaciones
+│   │   │   │   │   ├── compras.component.ts
+│   │   │   │   │   ├── operaciones-local.service.ts
+│   │   │   │   │   ├── taller.component.ts
+│   │   │   │   │   └── ventas.component.ts
+│   │   │   │   ├── productos
+│   │   │   │   │   ├── catalogos-admin
+│   │   │   │   │   │   └── catalogos-admin.component.ts
+│   │   │   │   │   ├── productos-list
+│   │   │   │   │   │   └── productos-list.component.ts
+│   │   │   │   │   └── producto-wizard
+│   │   │   │   │       └── producto-wizard.component.ts
+│   │   │   │   ├── reportes
+│   │   │   │   │   └── reportes.component.ts
+│   │   │   │   ├── servicios-taller
+│   │   │   │   │   └── servicios-taller.component.ts
+│   │   │   │   ├── shell
+│   │   │   │   │   └── shell.component.ts
+│   │   │   │   └── ventas
+│   │   │   │       └── ventas.component.ts
+│   │   │   └── shared
+│   │   │       ├── components
+│   │   │       │   ├── empty-state
+│   │   │       │   │   └── empty-state.component.ts
+│   │   │       │   ├── modal
+│   │   │       │   │   └── modal.component.ts
+│   │   │       │   └── toast
+│   │   │       │       └── toast.component.ts
+│   │   │       └── pipes
+│   │   │           └── currency-pen.pipe.ts
+│   │   ├── environments
+│   │   │   ├── environment.development.ts
+│   │   │   └── environment.ts
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   ├── styles.scss
+│   │   └── test-setup.ts
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.spec.json
+│   ├── vercel.json
+│   └── vitest.config.ts
+├── .git
+│   ├── branches
+│   ├── config
+│   ├── description
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   └── main
+│   │       └── remotes
+│   │           └── origin
+│   │               └── HEAD
+│   ├── objects
+│   │   ├── info
+│   │   └── pack
+│   │       ├── pack-31ffb554885b8e1bdbe72ef18d4263607eedecb0.idx
+│   │       ├── pack-31ffb554885b8e1bdbe72ef18d4263607eedecb0.pack
+│   │       └── pack-31ffb554885b8e1bdbe72ef18d4263607eedecb0.rev
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       └── HEAD
+│       └── tags
+├── .gitignore
+├── ms-alertas-notificaciones
+│   ├── Dockerfile
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── alertas
+│   │   │   │               ├── AlertasApplication.java
+│   │   │   │               ├── config
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   ├── AlertasController.java
+│   │   │   │               │   └── NotificacionesController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   ├── Alerta.java
+│   │   │   │               │   └── Notificacion.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── AlertaDto.java
+│   │   │   │               │   ├── CrearAlertaRequestDto.java
+│   │   │   │               │   ├── NotificacionDto.java
+│   │   │   │               │   ├── NotificarAlertaRequestDto.java
+│   │   │   │               │   └── PageResponseDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── AccesoDenegadoException.java
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── RecursoDuplicadoException.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── AlertaRepository.java
+│   │   │   │               │   └── NotificacionRepository.java
+│   │   │   │               └── service
+│   │   │   │                   ├── AlertasService.java
+│   │   │   │                   ├── NotificacionesService.java
+│   │   │   │                   └── ReferenceValidator.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── alertas
+│   │       │               └── AlertasApplicationTests.java
+│   │       └── resources
+│   │           └── application.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── alertas
+│       │               ├── AlertasApplication.class
+│       │               ├── config
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   ├── AlertasController.class
+│       │               │   └── NotificacionesController.class
+│       │               ├── domain
+│       │               │   ├── Alerta.class
+│       │               │   └── Notificacion.class
+│       │               ├── dto
+│       │               │   ├── AlertaDto.class
+│       │               │   ├── CrearAlertaRequestDto.class
+│       │               │   ├── NotificacionDto.class
+│       │               │   ├── NotificarAlertaRequestDto.class
+│       │               │   └── PageResponseDto.class
+│       │               ├── exception
+│       │               │   ├── AccesoDenegadoException.class
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── RecursoDuplicadoException.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── repository
+│       │               │   ├── AlertaRepository.class
+│       │               │   └── NotificacionRepository.class
+│       │               └── service
+│       │                   ├── AlertasService.class
+│       │                   ├── NotificacionesService.class
+│       │                   └── ReferenceValidator.class
+│       └── test-classes
+│           ├── application.yml
+│           └── com
+│               └── servillantas
+│                   └── alertas
+│                       └── AlertasApplicationTests.class
+├── ms-api-gateway
+│   ├── Dockerfile
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── rv
+│   │   │   │               └── gateway
+│   │   │   │                   ├── config
+│   │   │   │                   │   ├── SecurityConfig.java
+│   │   │   │                   │   └── UsuarioHeaderFilter.java
+│   │   │   │                   └── MsApiGatewayApplication.java
+│   │   │   └── resources
+│   │   │       └── application.yaml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── rv
+│   │       │               └── gateway
+│   │       │                   └── MsApiGatewayApplicationTests.java
+│   │       └── resources
+│   │           └── application-test.yaml
+│   └── target
+│       ├── classes
+│       │   ├── application.yaml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── rv
+│       │               └── gateway
+│       │                   ├── config
+│       │                   │   ├── SecurityConfig.class
+│       │                   │   └── UsuarioHeaderFilter.class
+│       │                   └── MsApiGatewayApplication.class
+│       ├── generated-sources
+│       │   └── annotations
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+│           ├── application-test.yaml
+│           └── com
+│               └── servillantas
+│                   └── rv
+│                       └── gateway
+│                           └── MsApiGatewayApplicationTests.class
+├── ms-asistente-ia
+│   ├── Dockerfile
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── asistente
+│   │   │   │               ├── AsistenteIaApplication.java
+│   │   │   │               ├── config
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   └── ConversacionesController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   ├── Conversacion.java
+│   │   │   │               │   └── Mensaje.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── AdjuntoDto.java
+│   │   │   │               │   ├── ChatRequestDto.java
+│   │   │   │               │   ├── ChatRespuestaDto.java
+│   │   │   │               │   ├── ConversacionDetalleDto.java
+│   │   │   │               │   ├── ConversacionDto.java
+│   │   │   │               │   ├── CrearConversacionRequestDto.java
+│   │   │   │               │   ├── CrearMensajeRequestDto.java
+│   │   │   │               │   ├── MensajeDto.java
+│   │   │   │               │   └── PageResponseDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── AccesoDenegadoException.java
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── GeminiException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── ConversacionRepository.java
+│   │   │   │               │   └── MensajeRepository.java
+│   │   │   │               └── service
+│   │   │   │                   ├── ChatAsistenteService.java
+│   │   │   │                   ├── ConversacionesService.java
+│   │   │   │                   └── GeminiClient.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── asistente
+│   │       │               ├── AsistenteIaApplicationTests.java
+│   │       │               └── service
+│   │       │                   ├── ChatAsistenteServiceTest.java
+│   │       │                   └── GeminiClientTest.java
+│   │       └── resources
+│   │           └── application.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── asistente
+│       │               ├── AsistenteIaApplication.class
+│       │               ├── config
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   └── ConversacionesController.class
+│       │               ├── domain
+│       │               │   ├── Conversacion.class
+│       │               │   └── Mensaje.class
+│       │               ├── dto
+│       │               │   ├── AdjuntoDto.class
+│       │               │   ├── ChatRequestDto.class
+│       │               │   ├── ChatRespuestaDto.class
+│       │               │   ├── ConversacionDetalleDto.class
+│       │               │   ├── ConversacionDto.class
+│       │               │   ├── CrearConversacionRequestDto.class
+│       │               │   ├── CrearMensajeRequestDto.class
+│       │               │   ├── MensajeDto.class
+│       │               │   └── PageResponseDto.class
+│       │               ├── exception
+│       │               │   ├── AccesoDenegadoException.class
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── GeminiException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── repository
+│       │               │   ├── ConversacionRepository.class
+│       │               │   └── MensajeRepository.class
+│       │               └── service
+│       │                   ├── ChatAsistenteService.class
+│       │                   ├── ConversacionesService.class
+│       │                   └── GeminiClient.class
+│       └── test-classes
+│           ├── application.yml
+│           └── com
+│               └── servillantas
+│                   └── asistente
+│                       ├── AsistenteIaApplicationTests.class
+│                       └── service
+│                           ├── ChatAsistenteServiceTest.class
+│                           └── GeminiClientTest.class
+├── ms-autenticacion-usuarios
+│   ├── Dockerfile
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── rv
+│   │   │   │               └── autenticacion
+│   │   │   │                   ├── config
+│   │   │   │                   │   └── DataInitializer.java
+│   │   │   │                   ├── controller
+│   │   │   │                   │   ├── AuthController.java
+│   │   │   │                   │   └── PerfilController.java
+│   │   │   │                   ├── dto
+│   │   │   │                   │   ├── auth
+│   │   │   │                   │   │   ├── LoginRequest.java
+│   │   │   │                   │   │   ├── LoginResponse.java
+│   │   │   │                   │   │   ├── RegistroRequest.java
+│   │   │   │                   │   │   └── RegistroResponse.java
+│   │   │   │                   │   └── perfil
+│   │   │   │                   │       ├── PerfilRequest.java
+│   │   │   │                   │       └── PerfilResponse.java
+│   │   │   │                   ├── entity
+│   │   │   │                   │   ├── Auditoria.java
+│   │   │   │                   │   ├── Perfil.java
+│   │   │   │                   │   └── Rol.java
+│   │   │   │                   ├── exception
+│   │   │   │                   │   ├── BadRequestException.java
+│   │   │   │                   │   ├── GlobalExceptionHandler.java
+│   │   │   │                   │   └── ResourceNotFoundException.java
+│   │   │   │                   ├── MsAutenticacionUsuariosApplication.java
+│   │   │   │                   ├── repository
+│   │   │   │                   │   ├── AuditoriaRepository.java
+│   │   │   │                   │   ├── PerfilRepository.java
+│   │   │   │                   │   └── RolRepository.java
+│   │   │   │                   ├── security
+│   │   │   │                   │   ├── CustomUserDetailsServiceImpl.java
+│   │   │   │                   │   ├── CustomUserDetailsService.java
+│   │   │   │                   │   ├── jwt
+│   │   │   │                   │   │   ├── JwtAuthenticationEntryPoint.java
+│   │   │   │                   │   │   ├── JwtAuthenticationFilter.java
+│   │   │   │                   │   │   └── JwtUtil.java
+│   │   │   │                   │   └── SecurityConfig.java
+│   │   │   │                   └── service
+│   │   │   │                       ├── AuthService.java
+│   │   │   │                       ├── impl
+│   │   │   │                       │   ├── AuthServiceImpl.java
+│   │   │   │                       │   ├── JwtServiceImpl.java
+│   │   │   │                       │   └── PerfilServiceImpl.java
+│   │   │   │                       ├── JwtService.java
+│   │   │   │                       └── PerfilService.java
+│   │   │   └── resources
+│   │   │       └── application.yaml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── rv
+│   │       │               └── autenticacion
+│   │       │                   └── MsAutenticacionUsuariosApplicationTests.java
+│   │       └── resources
+│   │           └── application.yaml
+│   └── target
+│       ├── classes
+│       │   ├── application.yaml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── rv
+│       │               └── autenticacion
+│       │                   ├── config
+│       │                   │   └── DataInitializer.class
+│       │                   ├── controller
+│       │                   │   ├── AuthController.class
+│       │                   │   └── PerfilController.class
+│       │                   ├── dto
+│       │                   │   ├── auth
+│       │                   │   │   ├── LoginRequest.class
+│       │                   │   │   ├── LoginResponse.class
+│       │                   │   │   ├── RegistroRequest.class
+│       │                   │   │   └── RegistroResponse.class
+│       │                   │   └── perfil
+│       │                   │       ├── PerfilRequest.class
+│       │                   │       └── PerfilResponse.class
+│       │                   ├── entity
+│       │                   │   ├── Auditoria.class
+│       │                   │   ├── Perfil.class
+│       │                   │   └── Rol.class
+│       │                   ├── exception
+│       │                   │   ├── BadRequestException.class
+│       │                   │   ├── GlobalExceptionHandler.class
+│       │                   │   └── ResourceNotFoundException.class
+│       │                   ├── MsAutenticacionUsuariosApplication.class
+│       │                   ├── repository
+│       │                   │   ├── AuditoriaRepository.class
+│       │                   │   ├── PerfilRepository.class
+│       │                   │   └── RolRepository.class
+│       │                   ├── security
+│       │                   │   ├── CustomUserDetailsService.class
+│       │                   │   ├── CustomUserDetailsServiceImpl.class
+│       │                   │   ├── jwt
+│       │                   │   │   ├── JwtAuthenticationEntryPoint.class
+│       │                   │   │   ├── JwtAuthenticationFilter.class
+│       │                   │   │   └── JwtUtil.class
+│       │                   │   └── SecurityConfig.class
+│       │                   └── service
+│       │                       ├── AuthService.class
+│       │                       ├── impl
+│       │                       │   ├── AuthServiceImpl.class
+│       │                       │   ├── JwtServiceImpl.class
+│       │                       │   └── PerfilServiceImpl.class
+│       │                       ├── JwtService.class
+│       │                       └── PerfilService.class
+│       ├── generated-sources
+│       │   └── annotations
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+│           ├── application.yaml
+│           └── com
+│               └── servillantas
+│                   └── rv
+│                       └── autenticacion
+│                           └── MsAutenticacionUsuariosApplicationTests.class
+├── ms-compras
+│   ├── Dockerfile
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── requests.http
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── compras
+│   │   │   │               ├── client
+│   │   │   │               │   ├── InventarioClient.java
+│   │   │   │               │   ├── MovimientoInventarioRequest.java
+│   │   │   │               │   ├── RestInventarioClient.java
+│   │   │   │               │   └── StubInventarioClient.java
+│   │   │   │               ├── ComprasApplication.java
+│   │   │   │               ├── config
+│   │   │   │               │   ├── ComprasDataInitializer.java
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   ├── ComprasController.java
+│   │   │   │               │   └── ProveedoresController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   ├── CompraEstado.java
+│   │   │   │               │   ├── Compra.java
+│   │   │   │               │   ├── DetalleCompra.java
+│   │   │   │               │   ├── DocumentoCompra.java
+│   │   │   │               │   ├── Producto.java
+│   │   │   │               │   └── Proveedor.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── AnularCompraRequestDto.java
+│   │   │   │               │   ├── CompraDetalleDto.java
+│   │   │   │               │   ├── CompraResumenDto.java
+│   │   │   │               │   ├── CrearCompraItemDto.java
+│   │   │   │               │   ├── CrearCompraRequestDto.java
+│   │   │   │               │   ├── CrearProveedorRequestDto.java
+│   │   │   │               │   ├── DetalleCompraDto.java
+│   │   │   │               │   ├── PageResponseDto.java
+│   │   │   │               │   ├── ProveedorDto.java
+│   │   │   │               │   └── ProveedorResumenDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── DuplicadoException.java
+│   │   │   │               │   ├── EstadoInvalidoException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── IdempotencyConflictException.java
+│   │   │   │               │   ├── InventarioNoDisponibleException.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── CompraRepository.java
+│   │   │   │               │   ├── DetalleCompraRepository.java
+│   │   │   │               │   ├── DocumentoCompraRepository.java
+│   │   │   │               │   ├── ProductoRepository.java
+│   │   │   │               │   └── ProveedorRepository.java
+│   │   │   │               └── service
+│   │   │   │                   ├── ComprasService.java
+│   │   │   │                   └── ProveedoresService.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── compras
+│   │       │               ├── controller
+│   │       │               │   ├── ComprasControllerTest.java
+│   │       │               │   └── ProveedoresControllerTest.java
+│   │       │               └── service
+│   │       │                   └── ComprasServiceTest.java
+│   │       └── resources
+│   │           └── application-test.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── compras
+│       │               ├── client
+│       │               │   ├── InventarioClient.class
+│       │               │   ├── MovimientoInventarioRequest.class
+│       │               │   ├── RestInventarioClient.class
+│       │               │   └── StubInventarioClient.class
+│       │               ├── ComprasApplication.class
+│       │               ├── config
+│       │               │   ├── ComprasDataInitializer.class
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   ├── ComprasController.class
+│       │               │   └── ProveedoresController.class
+│       │               ├── domain
+│       │               │   ├── Compra.class
+│       │               │   ├── CompraEstado.class
+│       │               │   ├── DetalleCompra.class
+│       │               │   ├── DocumentoCompra.class
+│       │               │   ├── Producto.class
+│       │               │   └── Proveedor.class
+│       │               ├── dto
+│       │               │   ├── AnularCompraRequestDto.class
+│       │               │   ├── CompraDetalleDto.class
+│       │               │   ├── CompraResumenDto.class
+│       │               │   ├── CrearCompraItemDto.class
+│       │               │   ├── CrearCompraRequestDto.class
+│       │               │   ├── CrearProveedorRequestDto.class
+│       │               │   ├── DetalleCompraDto.class
+│       │               │   ├── PageResponseDto.class
+│       │               │   ├── ProveedorDto.class
+│       │               │   └── ProveedorResumenDto.class
+│       │               ├── exception
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── DuplicadoException.class
+│       │               │   ├── EstadoInvalidoException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── IdempotencyConflictException.class
+│       │               │   ├── InventarioNoDisponibleException.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── repository
+│       │               │   ├── CompraRepository.class
+│       │               │   ├── DetalleCompraRepository.class
+│       │               │   ├── DocumentoCompraRepository.class
+│       │               │   ├── ProductoRepository.class
+│       │               │   └── ProveedorRepository.class
+│       │               └── service
+│       │                   ├── ComprasService.class
+│       │                   └── ProveedoresService.class
+│       └── test-classes
+│           ├── application-test.yml
+│           └── com
+│               └── servillantas
+│                   └── compras
+│                       ├── controller
+│                       │   ├── ComprasControllerTest.class
+│                       │   └── ProveedoresControllerTest.class
+│                       └── service
+│                           └── ComprasServiceTest.class
+├── ms-config-server
+│   ├── Dockerfile
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── infra
+│   │   │   │               └── ConfigServerApplication.java
+│   │   │   └── resources
+│   │   │       ├── application.yml
+│   │   │       └── config
+│   │   │           ├── application.yml
+│   │   │           ├── ms-alertas-notificaciones.yml
+│   │   │           ├── ms-api-gateway.yml
+│   │   │           ├── ms-asistente-ia.yml
+│   │   │           ├── ms-autenticacion-usuarios.yml
+│   │   │           ├── ms-compras.yml
+│   │   │           ├── ms-reportes.yml
+│   │   │           ├── ms-servicios.yml
+│   │   │           ├── msvc-inventario.yml
+│   │   │           ├── msvc-producto.yml
+│   │   │           └── ms-ventas.yml
+│   │   └── test
+│   │       └── java
+│   │           └── com
+│   │               └── servillantas
+│   │                   └── infra
+│   │                       └── ConfigServerApplicationTests.java
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   ├── com
+│       │   │   └── servillantas
+│       │   │       └── infra
+│       │   │           └── ConfigServerApplication.class
+│       │   └── config
+│       │       ├── application.yml
+│       │       ├── ms-alertas-notificaciones.yml
+│       │       ├── ms-api-gateway.yml
+│       │       ├── ms-asistente-ia.yml
+│       │       ├── ms-autenticacion-usuarios.yml
+│       │       ├── ms-compras.yml
+│       │       ├── ms-reportes.yml
+│       │       ├── ms-servicios.yml
+│       │       ├── msvc-inventario.yml
+│       │       ├── msvc-producto.yml
+│       │       └── ms-ventas.yml
+│       └── test-classes
+│           └── com
+│               └── servillantas
+│                   └── infra
+│                       └── ConfigServerApplicationTests.class
+├── ms-eureka-server
+│   ├── Dockerfile
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── infra
+│   │   │   │               └── EurekaServerApplication.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       └── java
+│   │           └── com
+│   │               └── servillantas
+│   │                   └── infra
+│   │                       └── EurekaServerApplicationTests.java
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── infra
+│       │               └── EurekaServerApplication.class
+│       └── test-classes
+│           └── com
+│               └── servillantas
+│                   └── infra
+│                       └── EurekaServerApplicationTests.class
+├── ms-inventario
+│   ├── Dockerfile
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── inventario
+│   │   │   │               ├── client
+│   │   │   │               │   └── AutenticacionClient.java
+│   │   │   │               ├── controller
+│   │   │   │               │   ├── AjusteInventarioController.java
+│   │   │   │               │   ├── InventarioController.java
+│   │   │   │               │   ├── InventarioKardexController.java
+│   │   │   │               │   └── MovimientoInventarioController.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── ajusteinventario
+│   │   │   │               │   │   ├── AjusteInventarioRequest.java
+│   │   │   │               │   │   └── AjusteInventarioResponse.java
+│   │   │   │               │   ├── inventario
+│   │   │   │               │   │   ├── InventarioRequest.java
+│   │   │   │               │   │   └── InventarioResponse.java
+│   │   │   │               │   ├── kardex
+│   │   │   │               │   │   ├── InventarioStockResponse.java
+│   │   │   │               │   │   ├── MovimientoKardexResponse.java
+│   │   │   │               │   │   ├── RegistrarEntradaRequest.java
+│   │   │   │               │   │   ├── RegistrarSalidaRequest.java
+│   │   │   │               │   │   └── RegistroInventarioResponse.java
+│   │   │   │               │   └── movimientoinventario
+│   │   │   │               │       ├── MovimientoInventarioRequest.java
+│   │   │   │               │       └── MovimientoInventarioResponse.java
+│   │   │   │               ├── entity
+│   │   │   │               │   ├── AjusteInventario.java
+│   │   │   │               │   ├── Inventario.java
+│   │   │   │               │   └── MovimientoInventario.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── ApiError.java
+│   │   │   │               │   ├── BusinessRuleException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── ResourceConflictException.java
+│   │   │   │               │   └── ResourceNotFoundException.java
+│   │   │   │               ├── mapper
+│   │   │   │               │   ├── AjusteInventarioMapper.java
+│   │   │   │               │   ├── InventarioMapper.java
+│   │   │   │               │   └── MovimientoInventarioMapper.java
+│   │   │   │               ├── MsvcInventarioApplication.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── AjusteInventarioRepository.java
+│   │   │   │               │   ├── InventarioRepository.java
+│   │   │   │               │   └── MovimientoInventarioRepository.java
+│   │   │   │               ├── security
+│   │   │   │               │   └── JwtUsuarioResolver.java
+│   │   │   │               └── service
+│   │   │   │                   ├── AjusteInventarioService.java
+│   │   │   │                   ├── impservice
+│   │   │   │                   │   ├── AjusteInventarioServiceImpl.java
+│   │   │   │                   │   ├── InventarioKardexServiceImpl.java
+│   │   │   │                   │   ├── InventarioServiceImpl.java
+│   │   │   │                   │   └── MovimientoInventarioServiceImpl.java
+│   │   │   │                   ├── InventarioKardexService.java
+│   │   │   │                   ├── InventarioService.java
+│   │   │   │                   ├── MotivoOrigenMapper.java
+│   │   │   │                   └── MovimientoInventarioService.java
+│   │   │   └── resources
+│   │   │       └── application.yaml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── inventario
+│   │       │               ├── DtoJsonContractTest.java
+│   │       │               ├── InventarioFlowIntegrationTests.java
+│   │       │               └── MsvcInventarioApplicationTests.java
+│   │       └── resources
+│   │           └── application.yaml
+│   └── target
+│       ├── classes
+│       │   ├── application.yaml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── inventario
+│       │               ├── client
+│       │               │   ├── AutenticacionClient$PerfilInfo.class
+│       │               │   └── AutenticacionClient.class
+│       │               ├── controller
+│       │               │   ├── AjusteInventarioController.class
+│       │               │   ├── InventarioController.class
+│       │               │   ├── InventarioKardexController.class
+│       │               │   └── MovimientoInventarioController.class
+│       │               ├── dto
+│       │               │   ├── ajusteinventario
+│       │               │   │   ├── AjusteInventarioRequest.class
+│       │               │   │   └── AjusteInventarioResponse.class
+│       │               │   ├── inventario
+│       │               │   │   ├── InventarioRequest.class
+│       │               │   │   └── InventarioResponse.class
+│       │               │   ├── kardex
+│       │               │   │   ├── InventarioStockResponse.class
+│       │               │   │   ├── MovimientoKardexResponse.class
+│       │               │   │   ├── RegistrarEntradaRequest.class
+│       │               │   │   ├── RegistrarSalidaRequest.class
+│       │               │   │   └── RegistroInventarioResponse.class
+│       │               │   └── movimientoinventario
+│       │               │       ├── MovimientoInventarioRequest.class
+│       │               │       └── MovimientoInventarioResponse.class
+│       │               ├── entity
+│       │               │   ├── AjusteInventario$AjusteInventarioBuilder.class
+│       │               │   ├── AjusteInventario.class
+│       │               │   ├── Inventario$InventarioBuilder.class
+│       │               │   ├── Inventario.class
+│       │               │   ├── MovimientoInventario$MovimientoInventarioBuilder.class
+│       │               │   └── MovimientoInventario.class
+│       │               ├── exception
+│       │               │   ├── ApiError.class
+│       │               │   ├── BusinessRuleException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── ResourceConflictException.class
+│       │               │   └── ResourceNotFoundException.class
+│       │               ├── mapper
+│       │               │   ├── AjusteInventarioMapper.class
+│       │               │   ├── AjusteInventarioMapperImpl.class
+│       │               │   ├── InventarioMapper.class
+│       │               │   ├── InventarioMapperImpl.class
+│       │               │   ├── MovimientoInventarioMapper.class
+│       │               │   └── MovimientoInventarioMapperImpl.class
+│       │               ├── MsvcInventarioApplication.class
+│       │               ├── repository
+│       │               │   ├── AjusteInventarioRepository.class
+│       │               │   ├── InventarioRepository.class
+│       │               │   └── MovimientoInventarioRepository.class
+│       │               ├── security
+│       │               │   ├── JwtUsuarioResolver$Usuario.class
+│       │               │   └── JwtUsuarioResolver.class
+│       │               └── service
+│       │                   ├── AjusteInventarioService.class
+│       │                   ├── impservice
+│       │                   │   ├── AjusteInventarioServiceImpl.class
+│       │                   │   ├── InventarioKardexServiceImpl.class
+│       │                   │   ├── InventarioServiceImpl.class
+│       │                   │   └── MovimientoInventarioServiceImpl.class
+│       │                   ├── InventarioKardexService.class
+│       │                   ├── InventarioService.class
+│       │                   ├── MotivoOrigenMapper.class
+│       │                   └── MovimientoInventarioService.class
+│       ├── generated-sources
+│       │   └── annotations
+│       │       └── com
+│       │           └── servillantas
+│       │               └── inventario
+│       │                   └── mapper
+│       │                       ├── AjusteInventarioMapperImpl.java
+│       │                       ├── InventarioMapperImpl.java
+│       │                       └── MovimientoInventarioMapperImpl.java
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+│           ├── application.yaml
+│           └── com
+│               └── servillantas
+│                   └── inventario
+│                       ├── DtoJsonContractTest.class
+│                       ├── InventarioFlowIntegrationTests.class
+│                       └── MsvcInventarioApplicationTests.class
+├── ms-productos
+│   ├── Dockerfile
+│   ├── docs
+│   │   └── ARQUITECTURA.md
+│   ├── .env.example
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── producto
+│   │   │   │               ├── config
+│   │   │   │               │   └── DataInitializer.java
+│   │   │   │               ├── controller
+│   │   │   │               │   ├── CategoriaController.java
+│   │   │   │               │   ├── MarcaController.java
+│   │   │   │               │   ├── ProductoController.java
+│   │   │   │               │   └── UnidadMedidaController.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── categoria
+│   │   │   │               │   │   ├── CategoriaRequest.java
+│   │   │   │               │   │   └── CategoriaResponse.java
+│   │   │   │               │   ├── marca
+│   │   │   │               │   │   ├── MarcaRequest.java
+│   │   │   │               │   │   └── MarcaResponse.java
+│   │   │   │               │   ├── producto
+│   │   │   │               │   │   ├── ProductoRequest.java
+│   │   │   │               │   │   └── ProductoResponse.java
+│   │   │   │               │   └── unidadmedida
+│   │   │   │               │       ├── UnidadMedidaRequest.java
+│   │   │   │               │       └── UnidadMedidaResponse.java
+│   │   │   │               ├── entity
+│   │   │   │               │   ├── Categoria.java
+│   │   │   │               │   ├── Marca.java
+│   │   │   │               │   ├── Producto.java
+│   │   │   │               │   └── UnidadMedida.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── BadRequestException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   └── ResourceNotFoundException.java
+│   │   │   │               ├── mapper
+│   │   │   │               │   ├── CategoriaMapper.java
+│   │   │   │               │   ├── MarcaMapper.java
+│   │   │   │               │   ├── ProductoMapper.java
+│   │   │   │               │   └── UnidadMedidaMapper.java
+│   │   │   │               ├── MsvcProductoApplication.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── CategoriaRepository.java
+│   │   │   │               │   ├── MarcaRepository.java
+│   │   │   │               │   ├── ProductoRepository.java
+│   │   │   │               │   └── UnidadMedidaRepository.java
+│   │   │   │               └── service
+│   │   │   │                   ├── CategoriaService.java
+│   │   │   │                   ├── impservice
+│   │   │   │                   │   ├── CategoriaServiceImpl.java
+│   │   │   │                   │   ├── MarcaServiceImpl.java
+│   │   │   │                   │   ├── ProductoServiceImpl.java
+│   │   │   │                   │   └── UnidadMedidaServiceImpl.java
+│   │   │   │                   ├── MarcaService.java
+│   │   │   │                   ├── ProductoService.java
+│   │   │   │                   └── UnidadMedidaService.java
+│   │   │   └── resources
+│   │   │       └── application.yaml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── producto
+│   │       │               └── MsvcProductoApplicationTests.java
+│   │       └── resources
+│   │           └── application.yaml
+│   └── target
+│       ├── classes
+│       │   ├── application.yaml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── producto
+│       │               ├── config
+│       │               │   └── DataInitializer.class
+│       │               ├── controller
+│       │               │   ├── CategoriaController.class
+│       │               │   ├── MarcaController.class
+│       │               │   ├── ProductoController.class
+│       │               │   └── UnidadMedidaController.class
+│       │               ├── dto
+│       │               │   ├── categoria
+│       │               │   │   ├── CategoriaRequest.class
+│       │               │   │   └── CategoriaResponse.class
+│       │               │   ├── marca
+│       │               │   │   ├── MarcaRequest.class
+│       │               │   │   └── MarcaResponse.class
+│       │               │   ├── producto
+│       │               │   │   ├── ProductoRequest.class
+│       │               │   │   └── ProductoResponse.class
+│       │               │   └── unidadmedida
+│       │               │       ├── UnidadMedidaRequest.class
+│       │               │       └── UnidadMedidaResponse.class
+│       │               ├── entity
+│       │               │   ├── Categoria$CategoriaBuilder.class
+│       │               │   ├── Categoria.class
+│       │               │   ├── Marca$MarcaBuilder.class
+│       │               │   ├── Marca.class
+│       │               │   ├── Producto$ProductoBuilder.class
+│       │               │   ├── Producto.class
+│       │               │   ├── UnidadMedida$UnidadMedidaBuilder.class
+│       │               │   └── UnidadMedida.class
+│       │               ├── exception
+│       │               │   ├── BadRequestException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   └── ResourceNotFoundException.class
+│       │               ├── mapper
+│       │               │   ├── CategoriaMapper.class
+│       │               │   ├── CategoriaMapperImpl.class
+│       │               │   ├── MarcaMapper.class
+│       │               │   ├── MarcaMapperImpl.class
+│       │               │   ├── ProductoMapper.class
+│       │               │   ├── ProductoMapperImpl.class
+│       │               │   ├── UnidadMedidaMapper.class
+│       │               │   └── UnidadMedidaMapperImpl.class
+│       │               ├── MsvcProductoApplication.class
+│       │               ├── repository
+│       │               │   ├── CategoriaRepository.class
+│       │               │   ├── MarcaRepository.class
+│       │               │   ├── ProductoRepository.class
+│       │               │   └── UnidadMedidaRepository.class
+│       │               └── service
+│       │                   ├── CategoriaService.class
+│       │                   ├── impservice
+│       │                   │   ├── CategoriaServiceImpl.class
+│       │                   │   ├── MarcaServiceImpl.class
+│       │                   │   ├── ProductoServiceImpl.class
+│       │                   │   └── UnidadMedidaServiceImpl.class
+│       │                   ├── MarcaService.class
+│       │                   ├── ProductoService.class
+│       │                   └── UnidadMedidaService.class
+│       ├── generated-sources
+│       │   └── annotations
+│       │       └── com
+│       │           └── servillantas
+│       │               └── producto
+│       │                   └── mapper
+│       │                       ├── CategoriaMapperImpl.java
+│       │                       ├── MarcaMapperImpl.java
+│       │                       ├── ProductoMapperImpl.java
+│       │                       └── UnidadMedidaMapperImpl.java
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+│           ├── application.yaml
+│           └── com
+│               └── servillantas
+│                   └── producto
+│                       └── MsvcProductoApplicationTests.class
+├── ms-reportes
+│   ├── Dockerfile
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── reportes
+│   │   │   │               ├── config
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   └── ReportesController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   └── Reporte.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── CrearReporteRequestDto.java
+│   │   │   │               │   ├── PageResponseDto.java
+│   │   │   │               │   └── ReporteDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── AccesoDenegadoException.java
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── ReportesApplication.java
+│   │   │   │               ├── repository
+│   │   │   │               │   └── ReporteRepository.java
+│   │   │   │               └── service
+│   │   │   │                   └── ReportesService.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── reportes
+│   │       │               └── ReportesApplicationTests.java
+│   │       └── resources
+│   │           └── application.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── reportes
+│       │               ├── config
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   └── ReportesController.class
+│       │               ├── domain
+│       │               │   └── Reporte.class
+│       │               ├── dto
+│       │               │   ├── CrearReporteRequestDto.class
+│       │               │   ├── PageResponseDto.class
+│       │               │   └── ReporteDto.class
+│       │               ├── exception
+│       │               │   ├── AccesoDenegadoException.class
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── ReportesApplication.class
+│       │               ├── repository
+│       │               │   └── ReporteRepository.class
+│       │               └── service
+│       │                   └── ReportesService.class
+│       └── test-classes
+│           ├── application.yml
+│           └── com
+│               └── servillantas
+│                   └── reportes
+│                       └── ReportesApplicationTests.class
+├── ms-servicios
+│   ├── Dockerfile
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── requests.http
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── servicios
+│   │   │   │               ├── client
+│   │   │   │               │   ├── InventarioClient.java
+│   │   │   │               │   ├── MovimientoInventarioRequest.java
+│   │   │   │               │   ├── RestInventarioClient.java
+│   │   │   │               │   └── StubInventarioClient.java
+│   │   │   │               ├── config
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   ├── ServiciosDataInitializer.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   ├── ServiciosController.java
+│   │   │   │               │   └── TiposServicioController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   ├── MaterialServicio.java
+│   │   │   │               │   ├── ServicioEstado.java
+│   │   │   │               │   ├── Servicio.java
+│   │   │   │               │   └── TipoServicio.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── ActualizarTipoServicioRequestDto.java
+│   │   │   │               │   ├── AnularServicioRequestDto.java
+│   │   │   │               │   ├── CrearMaterialRequestDto.java
+│   │   │   │               │   ├── CrearServicioRequestDto.java
+│   │   │   │               │   ├── CrearTipoServicioRequestDto.java
+│   │   │   │               │   ├── MaterialServicioDto.java
+│   │   │   │               │   ├── PageResponseDto.java
+│   │   │   │               │   ├── ServicioDetalleDto.java
+│   │   │   │               │   ├── ServicioResumenDto.java
+│   │   │   │               │   └── TipoServicioDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── IdempotencyConflictException.java
+│   │   │   │               │   ├── InventarioNoDisponibleException.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   ├── StockInsuficienteException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── MaterialServicioRepository.java
+│   │   │   │               │   ├── ServicioRepository.java
+│   │   │   │               │   └── TipoServicioRepository.java
+│   │   │   │               ├── service
+│   │   │   │               │   └── ServiciosService.java
+│   │   │   │               └── ServiciosApplication.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── servicios
+│   │       │               ├── controller
+│   │       │               │   └── ServiciosControllerTest.java
+│   │       │               └── service
+│   │       │                   └── ServiciosServiceTest.java
+│   │       └── resources
+│   │           └── application-test.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── servicios
+│       │               ├── client
+│       │               │   ├── InventarioClient.class
+│       │               │   ├── MovimientoInventarioRequest.class
+│       │               │   ├── RestInventarioClient.class
+│       │               │   └── StubInventarioClient.class
+│       │               ├── config
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   ├── ServiciosDataInitializer.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   ├── ServiciosController.class
+│       │               │   └── TiposServicioController.class
+│       │               ├── domain
+│       │               │   ├── MaterialServicio.class
+│       │               │   ├── Servicio.class
+│       │               │   ├── ServicioEstado.class
+│       │               │   └── TipoServicio.class
+│       │               ├── dto
+│       │               │   ├── ActualizarTipoServicioRequestDto.class
+│       │               │   ├── AnularServicioRequestDto.class
+│       │               │   ├── CrearMaterialRequestDto.class
+│       │               │   ├── CrearServicioRequestDto.class
+│       │               │   ├── CrearTipoServicioRequestDto.class
+│       │               │   ├── MaterialServicioDto.class
+│       │               │   ├── PageResponseDto.class
+│       │               │   ├── ServicioDetalleDto.class
+│       │               │   ├── ServicioResumenDto.class
+│       │               │   └── TipoServicioDto.class
+│       │               ├── exception
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── IdempotencyConflictException.class
+│       │               │   ├── InventarioNoDisponibleException.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   ├── StockInsuficienteException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── repository
+│       │               │   ├── MaterialServicioRepository.class
+│       │               │   ├── ServicioRepository.class
+│       │               │   └── TipoServicioRepository.class
+│       │               ├── service
+│       │               │   ├── ServiciosService$RegistroMaterialResult.class
+│       │               │   ├── ServiciosService$RegistroServicioResult.class
+│       │               │   └── ServiciosService.class
+│       │               └── ServiciosApplication.class
+│       └── test-classes
+│           ├── application-test.yml
+│           └── com
+│               └── servillantas
+│                   └── servicios
+│                       ├── controller
+│                       │   └── ServiciosControllerTest.class
+│                       └── service
+│                           └── ServiciosServiceTest.class
+├── ms-ventas
+│   ├── Dockerfile
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .mvn
+│   │   └── wrapper
+│   │       └── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── requests.http
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── servillantas
+│   │   │   │           └── ventas
+│   │   │   │               ├── client
+│   │   │   │               │   ├── InventarioClient.java
+│   │   │   │               │   ├── MovimientoInventarioRequest.java
+│   │   │   │               │   ├── RestInventarioClient.java
+│   │   │   │               │   └── StubInventarioClient.java
+│   │   │   │               ├── config
+│   │   │   │               │   ├── CorrelationFilter.java
+│   │   │   │               │   ├── CorsConfig.java
+│   │   │   │               │   └── UsuarioActualProvider.java
+│   │   │   │               ├── controller
+│   │   │   │               │   └── VentasController.java
+│   │   │   │               ├── domain
+│   │   │   │               │   ├── DetalleVenta.java
+│   │   │   │               │   ├── VentaEstado.java
+│   │   │   │               │   └── Venta.java
+│   │   │   │               ├── dto
+│   │   │   │               │   ├── AnularVentaRequestDto.java
+│   │   │   │               │   ├── CrearVentaItemDto.java
+│   │   │   │               │   ├── CrearVentaRequestDto.java
+│   │   │   │               │   ├── DetalleVentaDto.java
+│   │   │   │               │   ├── PageResponseDto.java
+│   │   │   │               │   ├── VentaDetalleDto.java
+│   │   │   │               │   └── VentaResumenDto.java
+│   │   │   │               ├── exception
+│   │   │   │               │   ├── BaseApiException.java
+│   │   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │   │               │   ├── IdempotencyConflictException.java
+│   │   │   │               │   ├── InventarioNoDisponibleException.java
+│   │   │   │               │   ├── RecursoNoEncontradoException.java
+│   │   │   │               │   ├── StockInsuficienteException.java
+│   │   │   │               │   └── ValidacionException.java
+│   │   │   │               ├── repository
+│   │   │   │               │   ├── DetalleVentaRepository.java
+│   │   │   │               │   └── VentaRepository.java
+│   │   │   │               ├── service
+│   │   │   │               │   └── VentasService.java
+│   │   │   │               └── VentasApplication.java
+│   │   │   └── resources
+│   │   │       └── application.yml
+│   │   └── test
+│   │       ├── java
+│   │       │   └── com
+│   │       │       └── servillantas
+│   │       │           └── ventas
+│   │       │               ├── controller
+│   │       │               │   └── VentasControllerTest.java
+│   │       │               └── service
+│   │       │                   └── VentasServiceTest.java
+│   │       └── resources
+│   │           └── application-test.yml
+│   └── target
+│       ├── classes
+│       │   ├── application.yml
+│       │   └── com
+│       │       └── servillantas
+│       │           └── ventas
+│       │               ├── client
+│       │               │   ├── InventarioClient.class
+│       │               │   ├── MovimientoInventarioRequest.class
+│       │               │   ├── RestInventarioClient.class
+│       │               │   └── StubInventarioClient.class
+│       │               ├── config
+│       │               │   ├── CorrelationFilter.class
+│       │               │   ├── CorsConfig.class
+│       │               │   └── UsuarioActualProvider.class
+│       │               ├── controller
+│       │               │   └── VentasController.class
+│       │               ├── domain
+│       │               │   ├── DetalleVenta.class
+│       │               │   ├── Venta.class
+│       │               │   └── VentaEstado.class
+│       │               ├── dto
+│       │               │   ├── AnularVentaRequestDto.class
+│       │               │   ├── CrearVentaItemDto.class
+│       │               │   ├── CrearVentaRequestDto.class
+│       │               │   ├── DetalleVentaDto.class
+│       │               │   ├── PageResponseDto.class
+│       │               │   ├── VentaDetalleDto.class
+│       │               │   └── VentaResumenDto.class
+│       │               ├── exception
+│       │               │   ├── BaseApiException.class
+│       │               │   ├── GlobalExceptionHandler.class
+│       │               │   ├── IdempotencyConflictException.class
+│       │               │   ├── InventarioNoDisponibleException.class
+│       │               │   ├── RecursoNoEncontradoException.class
+│       │               │   ├── StockInsuficienteException.class
+│       │               │   └── ValidacionException.class
+│       │               ├── repository
+│       │               │   ├── DetalleVentaRepository.class
+│       │               │   └── VentaRepository.class
+│       │               ├── service
+│       │               │   ├── VentasService$RegistroVentaResult.class
+│       │               │   └── VentasService.class
+│       │               └── VentasApplication.class
+│       └── test-classes
+│           ├── application-test.yml
+│           └── com
+│               └── servillantas
+│                   └── ventas
+│                       ├── controller
+│                       │   └── VentasControllerTest.class
+│                       └── service
+│                           └── VentasServiceTest.class
+├── README.md
+├── start-all.ps1
+├── start-all.sh
+├── start-tunnel.ps1
+└── stop-all.ps1
+
+577 directories, 937 files

@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CompraResumen } from '../../core/models/compra.model';
-import { Inventario } from '../../core/models/inventario.model';
+import { Inventario, MovimientoInventario } from '../../core/models/inventario.model';
 import { Producto } from '../../core/models/producto.model';
 import { ServicioResumen } from '../../core/models/servicio.model';
 import { VentaResumen } from '../../core/models/venta.model';
@@ -16,7 +16,7 @@ import { VentaService } from '../../core/services/venta.service';
 import { ExcelExportService } from '../../core/services/excel-export.service';
 import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
 
-type TipoReporte = 'inventario' | 'ventas' | 'compras' | 'taller';
+type TipoReporte = 'inventario' | 'movimientos' | 'ventas' | 'compras' | 'taller';
 interface FilaReporte {
   fecha: string;
   referencia: string;
@@ -168,6 +168,7 @@ export class ReportesComponent implements OnInit {
   private readonly excelExport = inject(ExcelExportService);
   productos: Producto[] = [];
   stock: Inventario[] = [];
+  movimientos: MovimientoInventario[] = [];
   compras: CompraResumen[] = [];
   ventas: VentaResumen[] = [];
   servicios: ServicioResumen[] = [];
@@ -182,6 +183,7 @@ export class ReportesComponent implements OnInit {
   get tituloReporte(): string {
     return ({
       inventario: 'Estado actual del inventario',
+      movimientos: 'Reporte de movimientos de inventario',
       ventas: 'Reporte de ventas',
       compras: 'Reporte de compras',
       taller: 'Reporte de servicios de taller',
@@ -200,6 +202,19 @@ export class ReportesComponent implements OnInit {
             estado: !producto?.activo ? 'Inactivo' : item.stockActual <= (producto?.stockMinimo ?? 0) ? 'Stock bajo' : 'Saludable',
             cantidad: item.stockActual,
             monto: item.stockActual * (producto?.precioVenta ?? 0),
+          };
+        });
+      case 'movimientos':
+        return this.movimientos.map((mov) => {
+          const producto = this.productos.find((p) => p.id === mov.productoId);
+          const precio = mov.costoUnitario ?? producto?.precioVenta ?? 0;
+          return {
+            fecha: mov.createdAt,
+            referencia: `${producto?.codigo ?? '—'} · ${producto?.nombre ?? 'Producto'}`,
+            descripcion: `${mov.motivo}${mov.observaciones ? ' · ' + mov.observaciones : ''} (Stock: ${mov.stockAnterior} → ${mov.stockPosterior})`,
+            estado: mov.tipo === 'entrada' ? 'ENTRADA (+)' : 'SALIDA (-)',
+            cantidad: mov.cantidad,
+            monto: mov.cantidad * precio,
           };
         });
       case 'ventas':
@@ -256,7 +271,7 @@ export class ReportesComponent implements OnInit {
     // El tipo de reporte se elige desde el menú lateral (?tipo=ventas, etc.)
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const tipo = params.get('tipo') as TipoReporte | null;
-      this.tipo = tipo && ['inventario', 'ventas', 'compras', 'taller'].includes(tipo) ? tipo : 'inventario';
+      this.tipo = tipo && ['inventario', 'movimientos', 'ventas', 'compras', 'taller'].includes(tipo) ? tipo : 'inventario';
     });
   }
 
@@ -318,6 +333,7 @@ export class ReportesComponent implements OnInit {
   private get nombreHoja(): string {
     return ({
       inventario: 'Inventario',
+      movimientos: 'Movimientos inventario',
       ventas: 'Ventas',
       compras: 'Compras',
       taller: 'Servicios taller',
@@ -329,7 +345,7 @@ export class ReportesComponent implements OnInit {
   cargarDatos(): void {
     this.cargando = true;
     this.error = '';
-    let remaining = 5;
+    let remaining = 6;
     const done = (): void => { remaining -= 1; if (remaining === 0) this.cargando = false; };
     this.productoService.listar({ includeInactivos: true }).subscribe({
       next: (items) => { this.productos = items; done(); },
@@ -338,6 +354,10 @@ export class ReportesComponent implements OnInit {
     this.inventarioService.obtenerStock().subscribe({
       next: (items) => { this.stock = items; done(); },
       error: () => { this.error = 'No se pudo cargar el inventario.'; done(); },
+    });
+    this.inventarioService.listarMovimientos().subscribe({
+      next: (items) => { this.movimientos = items; done(); },
+      error: () => { this.error = 'No se pudieron cargar los movimientos de inventario.'; done(); },
     });
     this.compraService.listar({ size: 500 }).subscribe({
       next: (res) => { this.compras = res.content; done(); },

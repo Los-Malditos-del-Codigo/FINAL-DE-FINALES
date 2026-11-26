@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { InventarioService } from '../../core/services/inventario.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { ReniecService } from '../../core/services/reniec.service';
@@ -69,7 +70,8 @@ interface VentaVista {
                 <td><span class="badge" [class.badge-success]="sale.estado === 'confirmada'" [class.badge-neutral]="sale.estado === 'anulada'">{{ sale.estado === 'confirmada' ? 'Confirmada' : 'Anulada' }}</span></td>
                 <td class="text-right"><div class="row-actions">
                   <button class="btn-action action-document" type="button" (click)="imprimirComprobante(sale)" title="Abrir comprobante para imprimir">Comprobante</button>
-                  @if (sale.estado === 'confirmada') {
+                  @if (sale.estado === 'confirmada' && esPropietario()) {
+                    <button class="btn-action action-return" type="button" (click)="abrirDevolucion(sale)" title="Registrar devolución parcial de productos (HU-51)">Devolución</button>
                     <button class="btn-action action-danger" type="button" (click)="abrirAnulacion(sale)">Anular</button>
                   }
                 </div></td>
@@ -129,6 +131,55 @@ interface VentaVista {
       </section></div>
     }
 
+    @if (modalDevolucion()) {
+      <div class="modal-backdrop" (click)="cerrarModales()">
+        <section class="operation-modal narrow-modal" role="dialog" aria-modal="true" aria-labelledby="return-title" (click)="$event.stopPropagation()">
+          <header class="modal-heading">
+            <div>
+              <h2 id="return-title">Devolución de productos · {{ ventaSeleccionada()?.id }} (HU-51)</h2>
+              <p>Selecciona el producto y las unidades devueltas por el cliente para reintegrarlas al inventario.</p>
+            </div>
+            <button class="icon-close" type="button" aria-label="Cerrar" (click)="cerrarModales()">✕</button>
+          </header>
+
+          @if (ventaSeleccionada(); as v) {
+            <div class="form-group">
+              <label for="ret-prod">Producto vendido</label>
+              <select id="ret-prod" class="form-control" [ngModel]="productoDevolucionId()" (ngModelChange)="alSeleccionarProductoDevolucion($event)">
+                @for (it of v.items; track it.productoId) {
+                  <option [value]="it.productoId" [disabled]="it.cantidad - it.devuelta <= 0">
+                    {{ it.codigo }} · {{ it.producto }} (Vendido: {{ it.cantidad }} · Devuelto: {{ it.devuelta }} · Disponible para devolver: {{ it.cantidad - it.devuelta }})
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ret-qty">Cantidad a devolver (máx. {{ maxDevolucionActual() }})</label>
+              <input id="ret-qty" type="number" class="form-control font-mono" min="1" [max]="maxDevolucionActual()" step="1" [ngModel]="cantidadDevolucion()" (ngModelChange)="cantidadDevolucion.set(+$event)" />
+            </div>
+
+            <div class="form-group">
+              <label for="ret-reason">Motivo de la devolución</label>
+              <input id="ret-reason" type="text" class="form-control" placeholder="Ej. Cambio de medida solicitada por el cliente" [ngModel]="motivoDevolucion()" (ngModelChange)="motivoDevolucion.set($event)" />
+            </div>
+          }
+
+          <footer class="modal-actions">
+            <button class="btn btn-secondary" type="button" (click)="cerrarModales()">Cancelar</button>
+            <button
+              class="btn btn-primary"
+              type="button"
+              [disabled]="guardando() || !productoDevolucionId() || cantidadDevolucion() < 1 || cantidadDevolucion() > maxDevolucionActual()"
+              (click)="confirmarDevolucion()"
+            >
+              {{ guardando() ? 'Reponiendo stock…' : 'Registrar devolución y reponer stock' }}
+            </button>
+          </footer>
+        </section>
+      </div>
+    }
+
   `,
   styles: [`
     .sales-page { max-width:1360px; margin:0 auto; }
@@ -156,6 +207,7 @@ interface VentaVista {
   `],
 })
 export class VentasComponent implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly ventasApi = inject(VentaService);
   private readonly productosApi = inject(ProductoService);
   private readonly inventarioApi = inject(InventarioService);
@@ -164,12 +216,18 @@ export class VentasComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly esPropietario = computed(() => this.authService.rol()?.nombre === 'propietario');
+
   readonly ventas = signal<VentaVista[]>([]);
   readonly productos = signal<Producto[]>([]);
   readonly inventarios = signal<Inventario[]>([]);
   readonly modalVenta = signal(false);
   readonly modalAnulacion = signal(false);
+  readonly modalDevolucion = signal(false);
   readonly ventaSeleccionada = signal<VentaVista | null>(null);
+  readonly productoDevolucionId = signal('');
+  readonly cantidadDevolucion = signal(1);
+  readonly motivoDevolucion = signal('');
   readonly productoSeleccionado = signal('');
   readonly cantidadItem = signal(1);
   readonly precioItem = signal(0);
@@ -298,6 +356,84 @@ export class VentasComponent implements OnInit {
 
   abrirAnulacion(sale: VentaVista): void { this.ventaSeleccionada.set(sale); this.motivoAnulacion.set(''); this.modalAnulacion.set(true); }
 
+  async abrirDevolucion(sale: VentaVista): Promise<void> {
+    const completa = sale.items.length ? sale : await this.vistaConItems(sale);
+    this.ventas.update((lista) => lista.map((v) => (v.id === completa.id ? completa : v)));
+    this.ventaSeleccionada.set(completa);
+    const primeraConDisponible = completa.items.find((it) => it.cantidad - it.devuelta > 0) ?? completa.items[0];
+    this.productoDevolucionId.set(primeraConDisponible?.productoId ?? '');
+    this.cantidadDevolucion.set(1);
+    this.motivoDevolucion.set('');
+    this.modalDevolucion.set(true);
+  }
+
+  alSeleccionarProductoDevolucion(prodId: string): void {
+    this.productoDevolucionId.set(prodId);
+    this.cantidadDevolucion.set(1);
+  }
+
+  maxDevolucionActual(): number {
+    const v = this.ventaSeleccionada();
+    if (!v) return 0;
+    const item = v.items.find((it) => it.productoId === this.productoDevolucionId());
+    return item ? Math.max(0, item.cantidad - item.devuelta) : 0;
+  }
+
+  async confirmarDevolucion(): Promise<void> {
+    const sale = this.ventaSeleccionada();
+    const prodId = this.productoDevolucionId();
+    const cant = Math.floor(this.cantidadDevolucion());
+    const max = this.maxDevolucionActual();
+    if (!sale || !prodId || cant < 1 || cant > max) return;
+
+    this.guardando.set(true);
+    try {
+      const item = sale.items.find((it) => it.productoId === prodId);
+      await firstValueFrom(
+        this.inventarioApi.registrarEntrada({
+          productoId: prodId,
+          cantidad: cant,
+          costoUnitario: null,
+          proveedor: null,
+          motivo: 'Devolución de cliente',
+          observaciones: `Devolución parcial de venta ${sale.id}${this.motivoDevolucion().trim() ? ': ' + this.motivoDevolucion().trim() : ''}`,
+        })
+      );
+      this.guardarDevolucionLocal(sale.id, prodId, cant);
+      const nuevosItems = sale.items.map((it) =>
+        it.productoId === prodId ? { ...it, devuelta: it.devuelta + cant } : it
+      );
+      const actualizada: VentaVista = { ...sale, items: nuevosItems };
+      this.ventas.update((lista) => lista.map((v) => (v.id === sale.id ? actualizada : v)));
+      this.recargarInventario();
+      this.modalDevolucion.set(false);
+      this.notificar(`Devolución de ${cant} unidad(es) de ${item?.producto ?? 'producto'} registrada y repuesta en inventario.`);
+    } catch (error: any) {
+      this.notificar(error?.error?.mensaje ?? 'No se pudo registrar la devolución.', true);
+    } finally {
+      this.guardando.set(false);
+    }
+  }
+
+  private obtenerDevolucionesLocal(ventaId: string): Record<string, number> {
+    try {
+      const raw = localStorage.getItem(`srv_venta_devoluciones:${ventaId}`);
+      return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  private guardarDevolucionLocal(ventaId: string, productoId: string, cantidadAdicional: number): void {
+    try {
+      const actual = this.obtenerDevolucionesLocal(ventaId);
+      actual[productoId] = (actual[productoId] ?? 0) + cantidadAdicional;
+      localStorage.setItem(`srv_venta_devoluciones:${ventaId}`, JSON.stringify(actual));
+    } catch {
+      /* noop */
+    }
+  }
+
   async confirmarAnulacion(): Promise<void> {
     const sale = this.ventaSeleccionada();
     const reason = this.motivoAnulacion().trim();
@@ -364,7 +500,7 @@ export class VentasComponent implements OnInit {
   }
   totalVenta(sale: VentaVista): number { return sale.items.reduce((sum, line) => sum + line.cantidad * line.precioUnitario, 0); }
   cantidadVendida(sale: VentaVista): number { return sale.items.reduce((sum, line) => sum + line.cantidad, 0); }
-  cerrarModales(): void { this.modalVenta.set(false); this.modalAnulacion.set(false); }
+  cerrarModales(): void { this.modalVenta.set(false); this.modalAnulacion.set(false); this.modalDevolucion.set(false); }
 
   private componerObservacion(): string | null {
     const parts: string[] = [];
@@ -394,9 +530,10 @@ export class VentasComponent implements OnInit {
   private async vistaConItems(sale: VentaVista): Promise<VentaVista> {
     try {
       const detalle = await firstValueFrom(this.ventasApi.obtenerPorId(sale.id));
+      const devueltas = this.obtenerDevolucionesLocal(sale.id);
       const items: LineaOperacion[] = sale.items.length ? sale.items : detalle.items.map((line) => {
         const product = this.productos().find((item) => item.id === line.productoId);
-        return { productoId: line.productoId, codigo: product?.codigo ?? '—', producto: product?.nombre ?? 'Producto', cantidad: line.cantidad, costoUnitario: 0, precioUnitario: line.precioUnitario, devuelta: 0 };
+        return { productoId: line.productoId, codigo: product?.codigo ?? '—', producto: product?.nombre ?? 'Producto', cantidad: line.cantidad, costoUnitario: 0, precioUnitario: line.precioUnitario, devuelta: devueltas[line.productoId] ?? 0 };
       });
       return { ...sale, items };
     } catch { return sale; }

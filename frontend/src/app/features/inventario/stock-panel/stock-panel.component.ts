@@ -1,6 +1,9 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 import { ProductoService } from '../../../core/services/producto.service';
 import { InventarioService } from '../../../core/services/inventario.service';
 import { CatalogoService } from '../../../core/services/catalogo.service';
@@ -25,7 +28,7 @@ type FiltroStock = 'todos' | 'agotados' | 'bajos' | 'saludables';
 @Component({
   selector: 'app-stock-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, RouterLink, EmptyStateComponent],
   template: `
     <div class="page-container">
       <!-- Encabezado Operativo Principal -->
@@ -37,8 +40,21 @@ type FiltroStock = 'todos' | 'agotados' | 'bajos' | 'saludables';
           </p>
         </div>
 
-        
+        @if (esPropietario()) {
+          <div class="header-actions">
+            <button type="button" class="btn btn-secondary" (click)="abrirCargaInicial()">
+              Carga inicial de existencias (HU-43)
+            </button>
+            <button type="button" class="btn btn-primary" (click)="abrirCorreccionStock()">
+              Corregir stock físico (HU-41)
+            </button>
+          </div>
+        }
       </div>
+
+      @if (mensaje()) {
+        <div class="notice" [class.notice-error]="esError()">{{ mensaje() }}</div>
+      }
 
       <!-- Tarjetas de Métricas Rápidas Operativas -->
       <div class="metrics-grid">
@@ -226,12 +242,136 @@ type FiltroStock = 'todos' | 'agotados' | 'bajos' | 'saludables';
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 21h14"></path></svg>
                       </a>
+                      @if (esPropietario()) {
+                        <button
+                          type="button"
+                          class="btn-row-action"
+                          (click)="abrirCorreccionStock(item)"
+                          title="Corregir stock por conteo físico (HU-41)"
+                          aria-label="Corregir stock"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
+        </div>
+      }
+
+      <!-- Modal HU-41: Corregir stock por conteo físico -->
+      @if (modalCorreccion()) {
+        <div class="modal-backdrop" (click)="cerrarModales()">
+          <section class="operation-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <header class="modal-heading">
+              <div>
+                <h2>Corregir stock por conteo físico (HU-41)</h2>
+                <p>Ingresa la cantidad real contada en almacén; el sistema ajustará automáticamente la diferencia.</p>
+              </div>
+              <button type="button" class="icon-close" (click)="cerrarModales()">✕</button>
+            </header>
+
+            <div class="form-group">
+              <label for="adj-prod">Producto <i>*</i></label>
+              <select id="adj-prod" class="form-control" [ngModel]="productoAjusteId()" (ngModelChange)="alSeleccionarProductoAjuste($event)">
+                <option value="">Selecciona un producto…</option>
+                @for (it of itemsStock(); track it.producto.id) {
+                  <option [value]="it.producto.id">[{{ it.producto.codigo }}] {{ it.producto.nombre }} (Sistema: {{ it.stockActual }})</option>
+                }
+              </select>
+            </div>
+
+            @if (itemAjusteSeleccionado(); as sel) {
+              <div class="stock-compare">
+                <div><span>Stock en sistema</span><strong>{{ sel.stockActual }} {{ sel.unidadAbrev }}</strong></div>
+                <div><span>Conteo físico real</span><strong>{{ stockFisicoContado() }} {{ sel.unidadAbrev }}</strong></div>
+                <div>
+                  <span>Diferencia a ajustar</span>
+                  <strong [class.text-success]="stockFisicoContado() - sel.stockActual > 0" [class.text-danger]="stockFisicoContado() - sel.stockActual < 0">
+                    {{ stockFisicoContado() - sel.stockActual > 0 ? '+' : '' }}{{ stockFisicoContado() - sel.stockActual }} {{ sel.unidadAbrev }}
+                  </strong>
+                </div>
+              </div>
+            }
+
+            <div class="form-group">
+              <label for="adj-qty">Cantidad física real contada <i>*</i></label>
+              <input id="adj-qty" type="number" min="0" step="1" class="form-control font-mono" [ngModel]="stockFisicoContado()" (ngModelChange)="stockFisicoContado.set(+$event)" />
+            </div>
+
+            <div class="form-group">
+              <label for="adj-reason">Motivo de la corrección <i>*</i></label>
+              <input id="adj-reason" type="text" class="form-control" placeholder="Ej. Diferencia encontrada en arqueo semanal de almacén" [ngModel]="motivoAjuste()" (ngModelChange)="motivoAjuste.set($event)" />
+            </div>
+
+            <footer class="modal-actions">
+              <button type="button" class="btn btn-secondary" (click)="cerrarModales()">Cancelar</button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="procesando() || !productoAjusteId() || stockFisicoContado() < 0 || !motivoAjuste().trim() || (itemAjusteSeleccionado()?.stockActual === stockFisicoContado())"
+                (click)="confirmarCorreccionStock()"
+              >
+                {{ procesando() ? 'Aplicando ajuste…' : 'Aplicar corrección de stock' }}
+              </button>
+            </footer>
+          </section>
+        </div>
+      }
+
+      <!-- Modal HU-43: Carga inicial de existencias -->
+      @if (modalCargaInicial()) {
+        <div class="modal-backdrop" (click)="cerrarModales()">
+          <section class="operation-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <header class="modal-heading">
+              <div>
+                <h2>Carga inicial de existencias (HU-43)</h2>
+                <p>Registra el inventario físico inicial de un producto para arrancar operaciones con cantidades reales.</p>
+              </div>
+              <button type="button" class="icon-close" (click)="cerrarModales()">✕</button>
+            </header>
+
+            <div class="form-group">
+              <label for="init-prod">Producto <i>*</i></label>
+              <select id="init-prod" class="form-control" [ngModel]="productoAjusteId()" (ngModelChange)="productoAjusteId.set($event)">
+                <option value="">Selecciona un producto…</option>
+                @for (it of itemsStock(); track it.producto.id) {
+                  <option [value]="it.producto.id">[{{ it.producto.codigo }}] {{ it.producto.nombre }} (Actual: {{ it.stockActual }})</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="init-qty">Cantidad inicial a cargar <i>*</i></label>
+                <input id="init-qty" type="number" min="1" step="1" class="form-control font-mono" [ngModel]="cantidadInicial()" (ngModelChange)="cantidadInicial.set(+$event)" />
+              </div>
+              <div class="form-group">
+                <label for="init-cost">Costo unitario referencial (S/ opcional)</label>
+                <input id="init-cost" type="number" min="0" step="0.01" class="form-control font-mono" [ngModel]="costoInicial()" (ngModelChange)="costoInicial.set(+$event)" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="init-notes">Observación</label>
+              <input id="init-notes" type="text" class="form-control" placeholder="Ej. Inventario inicial de apertura" [ngModel]="motivoAjuste()" (ngModelChange)="motivoAjuste.set($event)" />
+            </div>
+
+            <footer class="modal-actions">
+              <button type="button" class="btn btn-secondary" (click)="cerrarModales()">Cancelar</button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="procesando() || !productoAjusteId() || cantidadInicial() < 1"
+                (click)="confirmarCargaInicial()"
+              >
+                {{ procesando() ? 'Cargando existencias…' : 'Guardar existencia inicial' }}
+              </button>
+            </footer>
+          </section>
         </div>
       }
     </div>
@@ -493,12 +633,85 @@ type FiltroStock = 'todos' | 'agotados' | 'bajos' | 'saludables';
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
     }
+
+    .notice {
+      padding: 11px 14px;
+      border: 1px solid var(--state-success-border);
+      background: var(--state-success-bg);
+      color: var(--state-success);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+
+    .notice-error {
+      color: var(--state-danger);
+      border-color: var(--state-danger-border);
+      background: var(--state-danger-bg);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(18, 28, 34, .46);
+    }
+
+    .operation-modal {
+      width: min(560px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      padding: 22px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 18px 48px rgba(16, 24, 40, .2);
+    }
+
+    .modal-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .modal-heading h2 { margin: 0; font-size: 18px; }
+    .modal-heading p { margin-top: 4px; color: var(--text-secondary); font-size: 13px; }
+    .icon-close { width: 32px; height: 32px; border: 1px solid var(--border-color); border-radius: 4px; background: #fff; font-size: 16px; cursor: pointer; }
+    .form-group i { color: var(--state-danger); font-style: normal; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .stock-compare {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      div { display: flex; flex-direction: column; gap: 3px; }
+      span { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
+      strong { font: 700 15px var(--font-mono); color: var(--text-primary); }
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 16px;
+    }
   `],
 })
 export class StockPanelComponent implements OnInit {
+  private authService = inject(AuthService);
   private productoService = inject(ProductoService);
   private inventarioService = inject(InventarioService);
   private catalogoService = inject(CatalogoService);
+
+  readonly esPropietario = computed(() => this.authService.rol()?.nombre === 'propietario');
 
   cargando = signal<boolean>(true);
   productos = signal<Producto[]>([]);
@@ -509,6 +722,22 @@ export class StockPanelComponent implements OnInit {
 
   filtroTexto = signal<string>('');
   filtroEstado = signal<FiltroStock>('todos');
+
+  // Modales HU-41 y HU-43
+  readonly modalCorreccion = signal(false);
+  readonly modalCargaInicial = signal(false);
+  readonly productoAjusteId = signal('');
+  readonly stockFisicoContado = signal(0);
+  readonly cantidadInicial = signal(1);
+  readonly costoInicial = signal(0);
+  readonly motivoAjuste = signal('');
+  readonly procesando = signal(false);
+  readonly mensaje = signal('');
+  readonly esError = signal(false);
+
+  readonly itemAjusteSeleccionado = computed(() =>
+    this.itemsStock().find((it) => it.producto.id === this.productoAjusteId()) ?? null
+  );
 
   ngOnInit(): void {
     this.cargarTodo();
@@ -616,5 +845,111 @@ export class StockPanelComponent implements OnInit {
   resetFiltros(): void {
     this.filtroTexto.set('');
     this.filtroEstado.set('todos');
+  }
+
+  abrirCorreccionStock(item?: ProductoStockItem): void {
+    const sel = item ?? this.itemsStock()[0] ?? null;
+    this.productoAjusteId.set(sel?.producto.id ?? '');
+    this.stockFisicoContado.set(sel?.stockActual ?? 0);
+    this.motivoAjuste.set('Conteo físico de almacén');
+    this.modalCorreccion.set(true);
+  }
+
+  alSeleccionarProductoAjuste(prodId: string): void {
+    this.productoAjusteId.set(prodId);
+    const sel = this.itemsStock().find((it) => it.producto.id === prodId);
+    if (sel) {
+      this.stockFisicoContado.set(sel.stockActual);
+    }
+  }
+
+  abrirCargaInicial(): void {
+    const sel = this.itemsStock().find((it) => it.stockActual === 0) ?? this.itemsStock()[0] ?? null;
+    this.productoAjusteId.set(sel?.producto.id ?? '');
+    this.cantidadInicial.set(10);
+    this.costoInicial.set(0);
+    this.motivoAjuste.set('Existencias iniciales al iniciar operaciones en el sistema');
+    this.modalCargaInicial.set(true);
+  }
+
+  cerrarModales(): void {
+    this.modalCorreccion.set(false);
+    this.modalCargaInicial.set(false);
+  }
+
+  async confirmarCorreccionStock(): Promise<void> {
+    const sel = this.itemAjusteSeleccionado();
+    const contado = Math.floor(this.stockFisicoContado());
+    const motivo = this.motivoAjuste().trim();
+    if (!sel || contado < 0 || !motivo) return;
+    const diff = contado - sel.stockActual;
+    if (diff === 0) return;
+
+    this.procesando.set(true);
+    try {
+      if (diff > 0) {
+        await firstValueFrom(
+          this.inventarioService.registrarEntrada({
+            productoId: sel.producto.id,
+            cantidad: diff,
+            costoUnitario: null,
+            proveedor: null,
+            motivo: 'Ajuste de inventario',
+            observaciones: `Corrección por conteo físico (${sel.stockActual} → ${contado}): ${motivo}`,
+          })
+        );
+      } else {
+        await firstValueFrom(
+          this.inventarioService.registrarSalida({
+            productoId: sel.producto.id,
+            cantidad: Math.abs(diff),
+            motivo: 'Ajuste de inventario',
+            observaciones: `Corrección por conteo físico (${sel.stockActual} → ${contado}): ${motivo}`,
+          })
+        );
+      }
+      this.cerrarModales();
+      this.cargarTodo();
+      this.notificar(`Stock de ${sel.producto.nombre} corregido a ${contado} ${sel.unidadAbrev}.`);
+    } catch (err: any) {
+      this.notificar(err?.error?.mensaje || 'No se pudo aplicar la corrección de stock.', true);
+    } finally {
+      this.procesando.set(false);
+    }
+  }
+
+  async confirmarCargaInicial(): Promise<void> {
+    const prodId = this.productoAjusteId();
+    const cant = Math.floor(this.cantidadInicial());
+    if (!prodId || cant < 1) return;
+
+    this.procesando.set(true);
+    try {
+      await firstValueFrom(
+        this.inventarioService.registrarEntrada({
+          productoId: prodId,
+          cantidad: cant,
+          costoUnitario: this.costoInicial() > 0 ? this.costoInicial() : null,
+          proveedor: null,
+          motivo: 'Carga inicial de existencias',
+          observaciones: this.motivoAjuste().trim() || 'Carga inicial de existencias (HU-43)',
+        })
+      );
+      this.cerrarModales();
+      this.cargarTodo();
+      this.notificar(`Se cargaron ${cant} unidades iniciales correctamente.`);
+    } catch (err: any) {
+      this.notificar(err?.error?.mensaje || 'No se pudo registrar la carga inicial.', true);
+    } finally {
+      this.procesando.set(false);
+    }
+  }
+
+  private notificar(text: string, error = false): void {
+    this.mensaje.set(text);
+    this.esError.set(error);
+    window.setTimeout(() => {
+      if (this.mensaje() === text) this.mensaje.set('');
+    }, 5000);
   }
 }

@@ -9,7 +9,7 @@ import { ToastAlertasComponent } from '../../shared/components/toast/toast.compo
 
 type IconoNav =
   | 'box' | 'warehouse' | 'cart' | 'truck' | 'receipt' | 'wrench' | 'chart' | 'bell'
-  | 'list' | 'plus' | 'tag' | 'in' | 'out' | 'history' | 'users' | 'layers' | 'ruler' | 'sparkles';
+  | 'list' | 'plus' | 'tag' | 'in' | 'out' | 'history' | 'users' | 'layers' | 'ruler' | 'sparkles' | 'grid' | 'key';
 
 interface OperacionNav {
   etiqueta: string;
@@ -20,6 +20,8 @@ interface OperacionNav {
   accion?: boolean;
   /** Se considera activa también cuando la URL no trae el parámetro de consulta. */
   porDefecto?: boolean;
+  /** Visible únicamente para el rol propietario. */
+  soloPropietario?: boolean;
 }
 
 interface ModuloNav {
@@ -30,6 +32,8 @@ interface ModuloNav {
   /** Módulo sin submenú: el botón lleva directo a esta ruta. */
   ruta?: string;
   operaciones: OperacionNav[];
+  /** Visible únicamente para el rol propietario. */
+  soloPropietario?: boolean;
 }
 
 interface GrupoNav {
@@ -38,6 +42,8 @@ interface GrupoNav {
 }
 
 const ICONOS: Record<IconoNav, string[]> = {
+  grid: ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
+  key: ['m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4', 'm21 2-9.6 9.6', 'M7.5 15.5a4 4 0 1 1 5.66-5.66 4 4 0 0 1-5.66 5.66Z'],
   box: ['M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z', 'm3.3 7 8.7 5 8.7-5', 'M12 22V12'],
   warehouse: ['M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z', 'M6 18h12', 'M6 14h12', 'M6 10h12v12H6z'],
   cart: ['M8 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z', 'M19 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z', 'M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'],
@@ -60,6 +66,20 @@ const ICONOS: Record<IconoNav, string[]> = {
 
 const NAVEGACION: GrupoNav[] = [
   {
+    titulo: 'Resumen',
+    modulos: [
+      {
+        id: 'dashboard',
+        etiqueta: 'Dashboard',
+        icono: 'grid',
+        bases: ['/dashboard'],
+        ruta: '/dashboard',
+        soloPropietario: true,
+        operaciones: [],
+      },
+    ],
+  },
+  {
     titulo: 'Catálogo e inventario',
     modulos: [
       {
@@ -67,6 +87,7 @@ const NAVEGACION: GrupoNav[] = [
         etiqueta: 'Productos',
         icono: 'box',
         bases: ['/productos'],
+        soloPropietario: true,
         operaciones: [
           { etiqueta: 'Catálogo de productos', ruta: '/productos', icono: 'list' },
           { etiqueta: 'Agregar producto', ruta: '/productos/nuevo', icono: 'plus' },
@@ -84,7 +105,7 @@ const NAVEGACION: GrupoNav[] = [
           { etiqueta: 'Monitor de stock', ruta: '/inventario', icono: 'list' },
           { etiqueta: 'Registrar entrada', ruta: '/inventario/entrada', icono: 'in' },
           { etiqueta: 'Registrar salida', ruta: '/inventario/salida', icono: 'out' },
-          { etiqueta: 'Historial de movimientos', ruta: '/inventario/movimientos', icono: 'history' },
+          { etiqueta: 'Historial de movimientos', ruta: '/inventario/movimientos', icono: 'history', soloPropietario: true },
         ],
       },
     ],
@@ -97,6 +118,7 @@ const NAVEGACION: GrupoNav[] = [
         etiqueta: 'Compras',
         icono: 'cart',
         bases: ['/compras'],
+        soloPropietario: true,
         operaciones: [
           { etiqueta: 'Órdenes de compra', ruta: '/compras/ordenes', icono: 'list' },
           { etiqueta: 'Registrar compra', ruta: '/compras/ordenes', query: { nuevo: '1' }, icono: 'plus', accion: true },
@@ -107,6 +129,7 @@ const NAVEGACION: GrupoNav[] = [
         etiqueta: 'Proveedores',
         icono: 'truck',
         bases: ['/proveedores'],
+        soloPropietario: true,
         operaciones: [
           { etiqueta: 'Directorio de proveedores', ruta: '/proveedores', icono: 'users' },
           { etiqueta: 'Nuevo proveedor', ruta: '/proveedores', query: { nuevo: '1' }, icono: 'plus', accion: true },
@@ -135,8 +158,8 @@ const NAVEGACION: GrupoNav[] = [
         operaciones: [
           { etiqueta: 'Servicios realizados', ruta: '/taller/servicios', icono: 'list' },
           { etiqueta: 'Registrar servicio', ruta: '/taller/servicios', query: { nuevo: '1' }, icono: 'plus', accion: true },
-          { etiqueta: 'Tipos de servicio', ruta: '/taller/tipos', icono: 'layers' },
-          { etiqueta: 'Nuevo tipo de servicio', ruta: '/taller/tipos', query: { nuevo: '1' }, icono: 'plus', accion: true },
+          { etiqueta: 'Tipos de servicio', ruta: '/taller/tipos', icono: 'layers', soloPropietario: true },
+          { etiqueta: 'Nuevo tipo de servicio', ruta: '/taller/tipos', query: { nuevo: '1' }, icono: 'plus', accion: true, soloPropietario: true },
         ],
       },
     ],
@@ -162,8 +185,10 @@ const NAVEGACION: GrupoNav[] = [
         etiqueta: 'Reportes',
         icono: 'chart',
         bases: ['/reportes'],
+        soloPropietario: true,
         operaciones: [
           { etiqueta: 'Inventario', ruta: '/reportes', query: { tipo: 'inventario' }, icono: 'warehouse', porDefecto: true },
+          { etiqueta: 'Movimientos', ruta: '/reportes', query: { tipo: 'movimientos' }, icono: 'history' },
           { etiqueta: 'Ventas', ruta: '/reportes', query: { tipo: 'ventas' }, icono: 'receipt' },
           { etiqueta: 'Compras', ruta: '/reportes', query: { tipo: 'compras' }, icono: 'cart' },
           { etiqueta: 'Taller', ruta: '/reportes', query: { tipo: 'taller' }, icono: 'wrench' },
@@ -174,9 +199,22 @@ const NAVEGACION: GrupoNav[] = [
         etiqueta: 'Alertas',
         icono: 'bell',
         bases: ['/alertas'],
+        soloPropietario: true,
         operaciones: [
           { etiqueta: 'Todas las alertas', ruta: '/alertas', query: { estado: 'todas' }, icono: 'list', porDefecto: true },
           { etiqueta: 'Pendientes', ruta: '/alertas', query: { estado: 'pendiente' }, icono: 'bell' },
+        ],
+      },
+      {
+        id: 'usuarios',
+        etiqueta: 'Usuarios y personal',
+        icono: 'users',
+        bases: ['/usuarios'],
+        soloPropietario: true,
+        operaciones: [
+          { etiqueta: 'Personal registrado', ruta: '/usuarios', icono: 'users', porDefecto: true },
+          { etiqueta: 'Registrar personal', ruta: '/usuarios', query: { nuevo: '1' }, icono: 'plus', accion: true },
+          { etiqueta: 'Cambiar mi contraseña', ruta: '/usuarios', query: { password: '1' }, icono: 'key', accion: true },
         ],
       },
     ],
@@ -197,7 +235,7 @@ const NAVEGACION: GrupoNav[] = [
     <div class="shell-layout" [class.nav-open]="menuMovil()">
       <!-- Barra lateral por módulos -->
       <aside class="sidebar" aria-label="Navegación principal">
-        <a routerLink="/productos" class="sidebar-brand" (click)="menuMovil.set(false)">
+        <a [routerLink]="esPropietario() ? '/dashboard' : '/inventario'" class="sidebar-brand" (click)="menuMovil.set(false)">
           <span class="brand-mark"><img src="servillantaslogo.png" alt="" /></span>
           <span class="brand-text">
             <strong>Servillantas RV</strong>
@@ -206,7 +244,7 @@ const NAVEGACION: GrupoNav[] = [
         </a>
 
         <nav class="sidebar-nav">
-          @for (grupo of navegacion; track grupo.titulo) {
+          @for (grupo of navegacionVisible(); track grupo.titulo) {
             <div class="nav-group">
               <span class="nav-group-label">{{ grupo.titulo }}</span>
               @for (modulo of grupo.modulos; track modulo.id) {
@@ -298,6 +336,7 @@ const NAVEGACION: GrupoNav[] = [
           <div class="topbar-right">
             <span class="today">{{ hoy }}</span>
 
+            @if (esPropietario()) {
             <div class="notification-wrapper">
               <button
                 type="button"
@@ -357,6 +396,7 @@ const NAVEGACION: GrupoNav[] = [
                 </div>
               }
             </div>
+            }
           </div>
         </header>
 
@@ -365,7 +405,9 @@ const NAVEGACION: GrupoNav[] = [
         </main>
       </div>
 
-      <app-toast-alertas></app-toast-alertas>
+      @if (esPropietario()) {
+        <app-toast-alertas></app-toast-alertas>
+      }
     </div>
   `,
   styles: [`
@@ -898,6 +940,21 @@ export class ShellComponent {
   private readonly router = inject(Router);
 
   readonly navegacion = NAVEGACION;
+  readonly esPropietario = computed(() => this.authService.rol()?.nombre === 'propietario');
+  readonly navegacionVisible = computed<GrupoNav[]>(() => {
+    const esProp = this.esPropietario();
+    return this.navegacion
+      .map((grupo) => ({
+        ...grupo,
+        modulos: grupo.modulos
+          .filter((m) => !m.soloPropietario || esProp)
+          .map((m) => ({
+            ...m,
+            operaciones: m.operaciones.filter((op) => !op.soloPropietario || esProp),
+          })),
+      }))
+      .filter((grupo) => grupo.modulos.length > 0);
+  });
   readonly iconos = ICONOS;
   readonly hoy = ((f) => f.charAt(0).toUpperCase() + f.slice(1))(
     new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })

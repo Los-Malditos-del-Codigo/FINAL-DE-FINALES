@@ -3,13 +3,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InventarioService } from '../../core/services/inventario.service';
 import { ProductoService } from '../../core/services/producto.service';
-import { ComprasService } from '../../core/services/compras.service';
-import { VentasService } from '../../core/services/ventas.service';
-import { ServiciosTallerService } from '../../core/services/servicios-taller.service';
+import { CompraService } from '../../core/services/compra.service';
+import { VentaService } from '../../core/services/venta.service';
+import { ServicioService } from '../../core/services/servicio.service';
 import { MovimientoInventario } from '../../core/models/inventario.model';
-import { Venta } from '../../core/models/venta.model';
-import { Compra } from '../../core/models/compra.model';
-import { ServicioTaller } from '../../core/models/servicio-taller.model';
+import { VentaResumen } from '../../core/models/venta.model';
+import { CompraResumen } from '../../core/models/compra.model';
+import { ServicioResumen } from '../../core/models/servicio.model';
 import { Producto } from '../../core/models/producto.model';
 import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
 
@@ -22,9 +22,9 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
       <div class="page-header">
         <div>
           <h1 class="page-title">Panel de control</h1>
-          <p class="page-subtitle">Resumen de la operación de Servillantas RV.</p>
+          <p class="page-subtitle">Resumen en tiempo real de la operación de Servillantas RV (HU-29).</p>
         </div>
-        <span class="today">{{ hoy | date:'EEEE, d MMMM y' }}</span>
+        <span class="today">{{ hoy | date:'dd/MM/yyyy' }}</span>
       </div>
       @if (error) { <div class="alert-box alert-error" role="alert">{{ error }}</div> }
       @if (cargando) {
@@ -36,20 +36,20 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
             <span class="kpi-note">{{ unidadesStock }} unidades en inventario</span>
           </a>
           <a routerLink="/inventario" class="kpi-card warning">
-            <span class="kpi-label">Productos con stock bajo</span><strong>{{ stockBajo }}</strong>
+            <span class="kpi-label">Stock bajo o agotado</span><strong>{{ stockBajo }}</strong>
             <span class="kpi-note">Revisa existencias y mínimos</span>
           </a>
-          <a routerLink="/compras" class="kpi-card">
+          <a routerLink="/compras/ordenes" class="kpi-card">
             <span class="kpi-label">Compras pendientes</span><strong>{{ comprasPendientes }}</strong>
             <span class="kpi-note">Órdenes por recibir</span>
           </a>
           <a routerLink="/ventas" class="kpi-card">
-            <span class="kpi-label">Ventas de hoy</span><strong>{{ ventasHoy }}</strong>
-            <span class="kpi-note">{{ totalVentasHoy | currencyPen }} vendidos</span>
+            <span class="kpi-label">Ventas confirmadas</span><strong>{{ ventasConfirmadas }}</strong>
+            <span class="kpi-note">{{ totalVentasConfirmadas | currencyPen }} acumulados</span>
           </a>
-          <a routerLink="/servicios-taller" class="kpi-card">
-            <span class="kpi-label">Servicios en proceso</span><strong>{{ serviciosEnProceso }}</strong>
-            <span class="kpi-note">Órdenes activas del taller</span>
+          <a routerLink="/taller/servicios" class="kpi-card">
+            <span class="kpi-label">Servicios realizados</span><strong>{{ serviciosRealizados }}</strong>
+            <span class="kpi-note">{{ totalServiciosRealizados | currencyPen }} en taller</span>
           </a>
         </div>
 
@@ -92,7 +92,7 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
           </section>
           <section class="panel chart-panel">
             <div class="chart-heading">
-              <div><h2>Operaciones por día</h2><p>Cantidad de ventas y órdenes de taller</p></div>
+              <div><h2>Operaciones por día</h2><p>Cantidad de ventas y atenciones de taller</p></div>
               <div class="legend"><span class="legend-sales"></span>Ventas <span class="legend-workshop"></span>Taller</div>
             </div>
             <div class="chart-scroll">
@@ -106,7 +106,7 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
                     <title>{{ point.label }}: {{ point.ventasCount }} ventas</title>
                   </rect>
                   <rect [attr.x]="barX(i, 1)" [attr.y]="barY(point.tallerCount)" [attr.width]="barWidth" [attr.height]="barHeight(point.tallerCount)" rx="2" class="workshop-bar">
-                    <title>{{ point.label }}: {{ point.tallerCount }} órdenes de taller</title>
+                    <title>{{ point.label }}: {{ point.tallerCount }} atenciones de taller</title>
                   </rect>
                   @if (i === 0 || i === chartPoints.length - 1 || i % chartLabelStep === 0) {
                     <text [attr.x]="chartX(i)" y="238" text-anchor="middle" class="axis-label">{{ point.label }}</text>
@@ -140,19 +140,20 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
           </section>
           <section class="panel shortcuts">
             <h2>Accesos rápidos</h2>
-            <a routerLink="/ventas" class="shortcut">Registrar una venta <span>›</span></a>
-            <a routerLink="/servicios-taller" class="shortcut">Crear orden de taller <span>›</span></a>
-            <a routerLink="/compras" class="shortcut">Revisar órdenes de compra <span>›</span></a>
+            <a [routerLink]="['/ventas']" [queryParams]="{ nuevo: '1' }" class="shortcut">Registrar una venta <span>›</span></a>
+            <a [routerLink]="['/taller/servicios']" [queryParams]="{ nuevo: '1' }" class="shortcut">Registrar servicio de taller <span>›</span></a>
+            <a routerLink="/compras/ordenes" class="shortcut">Revisar órdenes de compra <span>›</span></a>
             <a routerLink="/reportes" class="shortcut">Consultar reportes <span>›</span></a>
+            <a routerLink="/usuarios" class="shortcut">Administrar personal <span>›</span></a>
           </section>
         </div>
       }
     </div>
   `,
   styles: [`
-    .today { color: var(--text-secondary); text-transform: capitalize; }
+    .today { color: var(--text-secondary); font-weight: 600; }
     .kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
-    .kpi-card { display: flex; flex-direction: column; min-height: 135px; padding: 18px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--surface-card); transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
+    .kpi-card { display: flex; flex-direction: column; min-height: 135px; padding: 18px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--surface-card); transition: transform var(--transition-fast), box-shadow var(--transition-fast); text-decoration: none; }
     .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(30, 36, 48, .08); }
     .kpi-label { color: var(--text-secondary); font-size: 13px; }
     .kpi-card strong { margin: 8px 0 4px; font-size: 28px; color: var(--text-primary); }
@@ -185,7 +186,7 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
     .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
     .panel-heading a { font-size: 13px; }
     .empty { color: var(--text-secondary); padding: 20px 0; }
-    .shortcut { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+    .shortcut { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; }
     .shortcut:last-child { border-bottom: 0; }
     .shortcut span { color: var(--accent-primary); font-size: 20px; line-height: 1; }
     .alert-box { padding: 10px 14px; margin-bottom: 14px; border-radius: var(--radius-md); }
@@ -197,17 +198,17 @@ import { CurrencyPenPipe } from '../../shared/pipes/currency-pen.pipe';
 export class DashboardComponent implements OnInit {
   private readonly inventarioService = inject(InventarioService);
   private readonly productoService = inject(ProductoService);
-  private readonly comprasService = inject(ComprasService);
-  private readonly ventasService = inject(VentasService);
-  private readonly talleresService = inject(ServiciosTallerService);
+  private readonly compraService = inject(CompraService);
+  private readonly ventaService = inject(VentaService);
+  private readonly servicioService = inject(ServicioService);
   readonly hoy = new Date();
   productos: Producto[] = [];
   movimientos: MovimientoInventario[] = [];
-  compras: Compra[] = [];
-  ventas: Venta[] = [];
-  servicios: ServicioTaller[] = [];
+  compras: CompraResumen[] = [];
+  ventas: VentaResumen[] = [];
+  servicios: ServicioResumen[] = [];
   stock: Array<{ productoId: string; stockActual: number }> = [];
-  periodoDias = 7;
+  periodoDias = 30;
   cargando = true;
   error = '';
 
@@ -219,16 +220,21 @@ export class DashboardComponent implements OnInit {
       return producto?.activo && item.stockActual <= producto.stockMinimo;
     }).length;
   }
-  get comprasPendientes(): number { return this.compras.filter((compra) => compra.estado === 'pendiente').length; }
-  get ventasHoy(): number {
-    const hoy = this.hoy.toISOString().slice(0, 10);
-    return this.ventas.filter((venta) => venta.fecha.slice(0, 10) === hoy).length;
+  get comprasPendientes(): number {
+    return this.compras.filter((compra) => compra.estado === 'REGISTRADA').length;
   }
-  get totalVentasHoy(): number {
-    const hoy = this.hoy.toISOString().slice(0, 10);
-    return this.ventas.filter((venta) => venta.fecha.slice(0, 10) === hoy).reduce((sum, venta) => sum + venta.total, 0);
+  get ventasConfirmadas(): number {
+    return this.ventas.filter((v) => v.estado !== 'ANULADA').length;
   }
-  get serviciosEnProceso(): number { return this.servicios.filter((servicio) => servicio.estado === 'en_proceso').length; }
+  get totalVentasConfirmadas(): number {
+    return this.ventas.filter((v) => v.estado !== 'ANULADA').reduce((sum, v) => sum + v.total, 0);
+  }
+  get serviciosRealizados(): number {
+    return this.servicios.filter((s) => s.estado !== 'ANULADO' && s.estado !== 'ANULADA').length;
+  }
+  get totalServiciosRealizados(): number {
+    return this.servicios.filter((s) => s.estado !== 'ANULADO' && s.estado !== 'ANULADA').reduce((sum, s) => sum + s.precio, 0);
+  }
 
   get chartPoints(): Array<{ key: string; label: string; ventas: number; taller: number; ventasCount: number; tallerCount: number }> {
     const points = Array.from({ length: this.periodoDias }, (_, index) => {
@@ -247,12 +253,14 @@ export class DashboardComponent implements OnInit {
     });
     const buckets = new Map(points.map((point) => [point.key, point]));
     for (const venta of this.ventas) {
+      if (venta.estado === 'ANULADA') continue;
       const point = buckets.get(this.dateKey(new Date(venta.fecha)));
       if (point) { point.ventas += venta.total; point.ventasCount += 1; }
     }
     for (const servicio of this.servicios) {
+      if (servicio.estado === 'ANULADO' || servicio.estado === 'ANULADA') continue;
       const point = buckets.get(this.dateKey(new Date(servicio.fecha)));
-      if (point) { point.taller += servicio.total; point.tallerCount += 1; }
+      if (point) { point.taller += servicio.precio; point.tallerCount += 1; }
     }
     return points;
   }
@@ -310,31 +318,31 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     let remaining = 6;
     const done = (): void => { remaining -= 1; if (remaining === 0) this.cargando = false; };
-    this.productoService.listar().subscribe({
+    this.productoService.listar({ includeInactivos: true }).subscribe({
       next: (items) => { this.productos = items; done(); },
-      error: () => { this.error = 'No se pudieron cargar los productos.'; done(); },
+      error: () => { done(); },
     });
     this.inventarioService.obtenerStock().subscribe({
       next: (items) => { this.stock = items; done(); },
-      error: () => { this.error = 'No se pudo cargar el inventario.'; done(); },
+      error: () => { done(); },
     });
     this.inventarioService.listarMovimientos().subscribe({
       next: (items) => { this.movimientos = items.slice(0, 6); done(); },
-      error: () => { this.error = 'No se pudieron cargar los movimientos.'; done(); },
+      error: () => { done(); },
     });
-    this.comprasService.listarCompras().subscribe({
-      next: (items) => { this.compras = items; done(); },
-      error: () => { this.error = 'No se pudieron cargar las compras.'; done(); },
+    this.compraService.listar({ size: 200 }).subscribe({
+      next: (page) => { this.compras = page.content; done(); },
+      error: () => { done(); },
     });
-    this.ventasService.listar().subscribe({
-      next: (items) => { this.ventas = items; done(); },
-      error: () => { this.error = 'No se pudieron cargar las ventas.'; done(); },
+    this.ventaService.listar({ size: 200 }).subscribe({
+      next: (page) => { this.ventas = page.content; done(); },
+      error: () => { done(); },
     });
-    this.talleresService.listar().subscribe({
-      next: (items) => { this.servicios = items; done(); },
-      error: () => { this.error = 'No se pudieron cargar los servicios.'; done(); },
+    this.servicioService.listar({ size: 200 }).subscribe({
+      next: (page) => { this.servicios = page.content; done(); },
+      error: () => { done(); },
     });
   }
 
-  nombreProducto(id: string): string { return this.productos.find((producto) => producto.id === id)?.nombre ?? 'Producto no encontrado'; }
+  nombreProducto(id: string): string { return this.productos.find((producto) => producto.id === id)?.nombre ?? 'Producto'; }
 }

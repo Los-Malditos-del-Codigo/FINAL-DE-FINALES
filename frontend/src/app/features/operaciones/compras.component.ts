@@ -20,6 +20,7 @@ interface CompraVista {
   cantidadItems: number;
   total: number;
   estado: 'pendiente' | 'recibida' | 'anulada';
+  documentos: DocumentoLocal[];
 }
 
 @Component({
@@ -107,6 +108,9 @@ interface CompraVista {
                   <td class="font-mono text-strong">{{ item.id }}</td><td>{{ item.fecha | date:'dd/MM/yyyy' }}</td><td>{{ item.proveedor }}</td><td>{{ item.cantidadItems }} productos</td>
                   <td class="text-right font-mono text-strong">{{ item.total | currency:'PEN':'symbol':'1.2-2' }}</td><td><span class="badge" [class.badge-warning]="item.estado === 'pendiente'" [class.badge-success]="item.estado === 'recibida'" [class.badge-neutral]="item.estado === 'anulada'">{{ etiquetaEstado(item.estado) }}</span></td>
                   <td class="text-right"><div class="row-actions">
+                    <button type="button" class="btn-action" (click)="abrirSustentoCompra(item)">
+                      {{ item.documentos.length ? 'Facturas / Guías (' + item.documentos.length + ')' : '+ Adjuntar factura/guía' }}
+                    </button>
                     @if (item.estado === 'pendiente') { <button type="button" class="btn-action action-receive" [disabled]="guardando()" (click)="recibirCompra(item)">Confirmar recepción</button><button type="button" class="btn-action action-danger" (click)="anularCompra(item)">Anular</button> }
                   </div></td>
                 </tr>
@@ -160,8 +164,48 @@ interface CompraVista {
             <button class="btn btn-secondary add-line" type="button" (click)="agregarLineaCompra()"><svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Agregar</button>
           </div>
           <div class="lines-table-wrap"><table class="data-table compact-table"><thead><tr><th>PRODUCTO</th><th>CANT.</th><th class="text-right">COSTO</th><th class="text-right">IMPORTE</th><th></th></tr></thead><tbody>@for (line of lineasCompra(); track line.productoId) {<tr><td>{{ line.codigo }} · {{ line.producto }}</td><td>{{ line.cantidad }}</td><td class="text-right">{{ line.costoUnitario | currency:'PEN':'symbol':'1.2-2' }}</td><td class="text-right">{{ line.cantidad * line.costoUnitario | currency:'PEN':'symbol':'1.2-2' }}</td><td><button class="btn-action text-danger" type="button" aria-label="Quitar producto" (click)="quitarLineaCompra(line.productoId)">Quitar</button></td></tr>} @empty {<tr><td colspan="5" class="empty-cell">Agrega productos a la orden.</td></tr>}</tbody></table></div>
-          <div class="attachment-box"><label for="purchase-documents">Documentos de sustento</label><input id="purchase-documents" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx" (change)="cargarDocumentos($event)" /><p>PDF, imágenes u Office. Máximo 1 MB por archivo.</p>@if (documentos().length) {<ul>@for (doc of documentos(); track doc.nombre) {<li>{{ doc.nombre }} <button class="btn-action text-danger" type="button" (click)="quitarDocumento(doc.nombre)">Quitar</button></li>}</ul>}</div>
+          <div class="attachment-box"><label for="purchase-documents">Documentos de sustento (Factura / Guía de remisión - HU-48)</label><input id="purchase-documents" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx" (change)="cargarDocumentos($event)" /><p>PDF, imágenes u Office. Máximo 1 MB por archivo.</p>@if (documentos().length) {<ul>@for (doc of documentos(); track doc.nombre) {<li>{{ doc.nombre }} <button class="btn-action text-danger" type="button" (click)="quitarDocumento(doc.nombre)">Quitar</button></li>}</ul>}</div>
           <footer class="modal-actions purchase-footer"><strong>Total de orden <span>{{ totalBorradorCompra | currency:'PEN':'symbol':'1.2-2' }}</span></strong><div><button type="button" class="btn btn-secondary" (click)="cerrarModales()">Cancelar</button><button type="button" class="btn btn-primary" [disabled]="guardando() || !proveedorSeleccionado() || !lineasCompra().length" (click)="guardarCompra()">{{ guardando() ? 'Guardando…' : 'Registrar orden' }}</button></div></footer>
+        </section>
+      </div>
+    }
+
+    @if (modalSustento()) {
+      <div class="modal-backdrop" (click)="cerrarModales()">
+        <section class="operation-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+          <header class="modal-heading">
+            <div>
+              <h2>Factura o guía de compra · {{ compraSustentoSeleccionada()?.id }}</h2>
+              <p>Adjunta, descarga o revisa los documentos de sustento de esta orden de compra (HU-48).</p>
+            </div>
+            <button class="icon-close" type="button" aria-label="Cerrar" (click)="cerrarModales()">✕</button>
+          </header>
+
+          <div class="attachment-box">
+            <label for="sustento-files">+ Agregar factura o guía de remisión</label>
+            <input id="sustento-files" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx" (change)="adjuntarACompraExistente($event)" />
+            <p>PDF, imágenes (PNG/JPG) u Office. Máximo 1 MB por archivo.</p>
+
+            @if (compraSustentoSeleccionada()?.documentos?.length) {
+              <ul>
+                @for (doc of compraSustentoSeleccionada()!.documentos; track doc.nombre) {
+                  <li>
+                    <span><strong>{{ doc.nombre }}</strong></span>
+                    <div class="row-actions">
+                      <a class="btn-action document-link" [href]="doc.dataUrl" [download]="doc.nombre" target="_blank" rel="noopener">Ver / Descargar</a>
+                      <button type="button" class="btn-action action-danger" (click)="eliminarDocumentoDeCompra(doc.nombre)">Eliminar</button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p style="margin-top:12px;">Aún no hay facturas ni guías adjuntas a esta orden de compra.</p>
+            }
+          </div>
+
+          <footer class="modal-actions">
+            <button type="button" class="btn btn-primary" (click)="cerrarModales()">Listo</button>
+          </footer>
         </section>
       </div>
     }
@@ -226,6 +270,8 @@ export class ComprasComponent implements OnInit {
   readonly productos = signal<Producto[]>([]);
   readonly modalProveedor = signal(false);
   readonly modalCompra = signal(false);
+  readonly modalSustento = signal(false);
+  readonly compraSustentoSeleccionada = signal<CompraVista | null>(null);
   readonly consultandoDoc = signal(false);
   readonly estadoReniec = signal('');
   readonly reniecExito = signal(false);
@@ -442,18 +488,83 @@ export class ComprasComponent implements OnInit {
       })),
     };
     this.guardando.set(true);
+    const adjuntos = [...this.documentos()];
     this.comprasApi.crear(dto, crypto.randomUUID()).subscribe({
       next: (item) => {
         this.guardando.set(false);
+        if (adjuntos.length) {
+          this.guardarDocumentosLocal(item.id, adjuntos);
+        }
         this.refrescarListas();
         this.modalCompra.set(false);
-        this.notificar(`Orden ${item.id} registrada como pendiente de recepción.`);
+        this.notificar(`Orden ${item.id} registrada${adjuntos.length ? ' con su factura/guía adjunta' : ''}.`);
       },
       error: (error) => {
         this.guardando.set(false);
         this.notificar(error?.error?.mensaje ?? 'No se pudo registrar la compra.', true);
       },
     });
+  }
+
+  abrirSustentoCompra(item: CompraVista): void {
+    this.compraSustentoSeleccionada.set(item);
+    this.modalSustento.set(true);
+  }
+
+  async adjuntarACompraExistente(event: Event): Promise<void> {
+    const compra = this.compraSustentoSeleccionada();
+    if (!compra) return;
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    const actuales = [...compra.documentos];
+    for (const file of files) {
+      if (file.size > 1024 * 1024) {
+        this.notificar(`${file.name} supera el límite de 1 MB.`, true);
+        continue;
+      }
+      try {
+        const dataUrl = await this.leerArchivo(file);
+        const idx = actuales.findIndex((d) => d.nombre === file.name);
+        if (idx >= 0) actuales.splice(idx, 1);
+        actuales.push({ nombre: file.name, dataUrl, tipo: file.type, bytes: file.size });
+      } catch {
+        this.notificar(`No se pudo leer ${file.name}.`, true);
+      }
+    }
+    input.value = '';
+    this.guardarDocumentosLocal(compra.id, actuales);
+    const actualizada = { ...compra, documentos: actuales };
+    this.compraSustentoSeleccionada.set(actualizada);
+    this.compras.update((lista) => lista.map((c) => (c.id === compra.id ? actualizada : c)));
+    this.notificar('Factura / guía adjuntada a la orden de compra.');
+  }
+
+  eliminarDocumentoDeCompra(nombre: string): void {
+    const compra = this.compraSustentoSeleccionada();
+    if (!compra) return;
+    const nuevos = compra.documentos.filter((d) => d.nombre !== nombre);
+    this.guardarDocumentosLocal(compra.id, nuevos);
+    const actualizada = { ...compra, documentos: nuevos };
+    this.compraSustentoSeleccionada.set(actualizada);
+    this.compras.update((lista) => lista.map((c) => (c.id === compra.id ? actualizada : c)));
+  }
+
+  private obtenerDocumentosLocal(compraId: string): DocumentoLocal[] {
+    try {
+      const raw = localStorage.getItem(`srv_compra_docs:${compraId}`);
+      return raw ? (JSON.parse(raw) as DocumentoLocal[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private guardarDocumentosLocal(compraId: string, docs: DocumentoLocal[]): void {
+    try {
+      if (docs.length) localStorage.setItem(`srv_compra_docs:${compraId}`, JSON.stringify(docs));
+      else localStorage.removeItem(`srv_compra_docs:${compraId}`);
+    } catch {
+      this.notificar('No se pudo guardar el archivo en el almacenamiento local (límite de tamaño excedido).', true);
+    }
   }
 
   recibirCompra(item: CompraVista): void {
@@ -485,7 +596,7 @@ export class ComprasComponent implements OnInit {
   }
 
   etiquetaEstado(estado: CompraVista['estado']): string { return estado === 'pendiente' ? 'Pendiente' : estado === 'recibida' ? 'Recibida' : 'Anulada'; }
-  cerrarModales(): void { this.modalProveedor.set(false); this.modalCompra.set(false); }
+  cerrarModales(): void { this.modalProveedor.set(false); this.modalCompra.set(false); this.modalSustento.set(false); }
 
   private refrescarListas(): void {
     this.proveedoresApi.listar({ size: 100 }).subscribe({
@@ -515,6 +626,7 @@ export class ComprasComponent implements OnInit {
       total: item.total,
       estado,
       proveedorId: item.proveedorId,
+      documentos: this.obtenerDocumentosLocal(item.id),
     };
   }
   private notificar(text: string, error = false): void { this.mensaje.set(text); this.esError.set(error); window.setTimeout(() => { if (this.mensaje() === text) this.mensaje.set(''); }, 5000); }

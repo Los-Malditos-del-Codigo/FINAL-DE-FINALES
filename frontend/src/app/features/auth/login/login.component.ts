@@ -510,7 +510,8 @@ export class LoginComponent implements OnDestroy {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         this.cargando = false;
-        this.router.navigate(['/productos']);
+        const destino = this.authService.rol()?.nombre === 'propietario' ? '/dashboard' : '/inventario';
+        this.router.navigate([destino]);
       },
       error: (err) => {
         this.cargando = false;

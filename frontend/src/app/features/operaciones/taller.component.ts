@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { InventarioService } from '../../core/services/inventario.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { ReniecService } from '../../core/services/reniec.service';
@@ -95,7 +96,7 @@ interface ServicioVista {
                   <td class="text-right"><div class="row-actions">
                     <button class="btn-action action-document" type="button" (click)="imprimirComprobante(service)" title="Abrir comprobante para imprimir">Comprobante</button>
                     <button class="btn-action action-detail" type="button" (click)="verDetalle(service)">Detalle</button>
-                    @if (service.estado === 'realizado') { <button class="btn-action action-danger" type="button" (click)="abrirAnulacion(service)">Anular</button> }
+                    @if (service.estado === 'realizado' && esPropietario()) { <button class="btn-action action-danger" type="button" (click)="abrirAnulacion(service)">Anular</button> }
                   </div></td>
                 </tr>
                 @if (detalleAbierto() === service.id) {
@@ -198,6 +199,7 @@ interface ServicioVista {
   `],
 })
 export class TallerComponent implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly servicioApi = inject(ServicioService);
   private readonly tipoServicioApi = inject(TipoServicioService);
   private readonly productosApi = inject(ProductoService);
@@ -208,6 +210,8 @@ export class TallerComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private tiposCargados = false;
   private abrirServicioAlCargar = false;
+
+  readonly esPropietario = computed(() => this.authService.rol()?.nombre === 'propietario');
 
   readonly vista = signal<'historial' | 'catalogo'>(this.route.snapshot.data['vista'] === 'catalogo' ? 'catalogo' : 'historial');
   readonly servicios = signal<ServicioVista[]>([]);

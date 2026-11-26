@@ -155,8 +155,9 @@ const PROVEEDORES_REFERENCIALES = [
                 formControlName="motivo"
               >
                 <option value="Compra">Compra a distribuidor / mayorista</option>
+                <option value="Carga inicial de existencias">Carga inicial de existencias (inventario inicial - HU-43)</option>
                 <option value="Devolución de cliente">Devolución de cliente</option>
-                <option value="Ajuste de inventario">Ajuste de inventario (conteo físico)</option>
+                <option value="Ajuste de inventario">Ajuste de inventario (conteo físico - HU-41)</option>
                 <option value="Otro">Otro (especificar abajo)</option>
               </select>
               @if (esInvalido('motivo')) {

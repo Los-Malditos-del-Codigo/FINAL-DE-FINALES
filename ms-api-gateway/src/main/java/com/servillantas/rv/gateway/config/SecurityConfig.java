@@ -87,11 +87,12 @@ public class SecurityConfig {
                                 "/api/v1/proveedores/**",
                                 "/api/v1/tipos-servicio/**"
                         ).permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/v1/productos/**").hasAnyRole("PROPIETARIO", "PERSONAL")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/productos/**").hasAnyRole("PROPIETARIO", "PERSONAL")
-                        .pathMatchers(HttpMethod.DELETE, "/api/v1/productos/**").hasAnyRole("PROPIETARIO", "PERSONAL")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/productos/**").hasRole("PROPIETARIO")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/productos/**").hasRole("PROPIETARIO")
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/productos/**").hasRole("PROPIETARIO")
                         .pathMatchers("/api/v1/categorias/**", "/api/v1/marcas/**", "/api/v1/unidades-medida/**")
-                            .hasAnyRole("PROPIETARIO", "PERSONAL")
+                            .hasRole("PROPIETARIO")
+                        .pathMatchers("/api/v1/perfiles/**").hasRole("PROPIETARIO")
 
                         // Resto de operaciones de la API requieren token JWT válido
                         .pathMatchers("/api/v1/**").authenticated()
